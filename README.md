@@ -31,16 +31,16 @@ npm run preview
 
 ## GitHub Pages
 
-The included GitHub Actions workflow deploys the static frontend when changes are pushed to `main`. It expects this repository name:
+The included GitHub Actions workflow enables GitHub Pages and deploys the static frontend when changes are pushed to `main`. It expects this repository name:
 
 ```text
 aeroedu-frontend-demo
 ```
 
-After pushing, enable GitHub Pages for the repository with **GitHub Actions** as the build and deployment source. The site will be available at:
+The site will be available at:
 
 ```text
-https://<github-username>.github.io/aeroedu-frontend-demo/
+https://rksoftbd123-coder.github.io/aeroedu-frontend-demo/
 ```
 
 All data and credentials shown in this public demo are mock values. Do not add real personal data, API keys, or secrets.
