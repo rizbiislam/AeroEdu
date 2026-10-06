@@ -1,0 +1,131 @@
+/* Navbar & Header Responsive Layout Styles */
+
+.top-navbar {
+  min-height: 64px;
+  background-color: var(--bg-sidebar);
+  border-bottom: 1px solid var(--border-subtle);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 24px;
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  backdrop-filter: blur(12px);
+  gap: 16px;
+  box-sizing: border-box;
+  width: 100%;
+}
+
+.navbar-brand-col {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.navbar-brand-info {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.navbar-title-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.navbar-institute-name {
+  font-weight: 700;
+  font-size: 0.95rem;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: var(--text-main);
+}
+
+.navbar-meta-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.72rem;
+  color: var(--text-dim);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.navbar-meta-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: #10b981;
+  font-weight: 600;
+}
+
+.navbar-actions-col {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.navbar-user-profile {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding-left: 10px;
+  border-left: 1px solid var(--border-subtle);
+}
+
+.navbar-user-text {
+  line-height: 1.2;
+}
+
+.navbar-user-name {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.navbar-user-email {
+  font-size: 0.68rem;
+  color: var(--text-dim);
+  white-space: nowrap;
+}
+
+/* Media Queries for Responsive Top Bar */
+@media (max-width: 1100px) {
+  .navbar-meta-academic-year {
+    display: none !important;
+  }
+  .navbar-user-email {
+    display: none !important;
+  }
+}
+
+@media (max-width: 860px) {
+  .top-navbar {
+    padding: 8px 16px;
+    gap: 8px;
+  }
+  .navbar-meta-affiliation {
+    display: none !important;
+  }
+  .navbar-meta-divider {
+    display: none !important;
+  }
+}
+
+@media (max-width: 640px) {
+  .navbar-user-name {
+    display: none !important;
+  }
+  .navbar-meta-row {
+    display: none !important;
+  }
+}

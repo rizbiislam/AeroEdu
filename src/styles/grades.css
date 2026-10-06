@@ -1,0 +1,212 @@
+/* Academic Assessment & Board Grading Suite Styles */
+
+.grades-container {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+.grades-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.grades-tabs-nav {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border-bottom: 1px solid var(--border-subtle);
+  padding-bottom: 12px;
+  overflow-x: auto;
+}
+
+.grades-tab-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 18px;
+  border-radius: 8px;
+  border: none;
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+  background: var(--bg-surface);
+  color: var(--text-muted);
+  white-space: nowrap;
+  transition: all 0.2s ease;
+}
+
+.grades-tab-btn:hover {
+  background: var(--bg-card-hover);
+  color: var(--text-main);
+}
+
+.grades-tab-btn.active {
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  color: #ffffff;
+  box-shadow: 0 2px 10px rgba(59, 130, 246, 0.35);
+}
+
+/* Tabulation Sheet Matrix */
+.tabulation-wrapper {
+  overflow-x: auto;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-subtle);
+  background: var(--bg-card);
+}
+
+.tabulation-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.8rem;
+  text-align: center;
+}
+
+.tabulation-table th {
+  padding: 8px 10px;
+  border: 1px solid var(--border-subtle);
+  background: var(--bg-surface);
+  font-weight: 700;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.tabulation-table td {
+  padding: 8px 10px;
+  border: 1px solid var(--border-subtle);
+}
+
+.tabulation-table tr:hover td {
+  background: var(--bg-card-hover);
+}
+
+.tabulation-sub-header {
+  font-size: 0.68rem;
+  color: var(--text-dim);
+  font-weight: 600;
+}
+
+/* Component Mark Entry Form */
+.mark-entry-form-container {
+  display: grid;
+  grid-template-columns: minmax(320px, 380px) 1fr;
+  gap: 22px;
+  align-items: start;
+}
+
+.mark-entry-card {
+  padding: 18px;
+  border-radius: var(--radius-lg);
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+}
+
+.mark-input {
+  width: 100%;
+  padding: 8px 12px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-medium);
+  background: var(--bg-surface);
+  color: var(--text-main);
+  font-family: var(--font-mono);
+  font-size: 0.95rem;
+  font-weight: 700;
+  box-sizing: border-box;
+  transition: border-color 0.15s ease;
+}
+
+.mark-input:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+}
+
+/* Printable Academic Transcript */
+.transcript-card-container {
+  background: #ffffff;
+  color: #0f172a;
+  border-radius: 12px;
+  padding: 36px;
+  border: 2px solid #cbd5e1;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+  font-family: 'Times New Roman', Times, serif;
+  position: relative;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+.transcript-watermark {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) rotate(-25deg);
+  font-size: 4.5rem;
+  font-weight: 900;
+  color: rgba(15, 23, 42, 0.035);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  white-space: nowrap;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.transcript-inner {
+  position: relative;
+  z-index: 2;
+  border: 1.5px solid #0f172a;
+  padding: 24px;
+  background: #ffffff;
+}
+
+.transcript-header {
+  text-align: center;
+  border-bottom: 2px double #0f172a;
+  padding-bottom: 14px;
+  margin-bottom: 20px;
+}
+
+.transcript-title {
+  font-size: 1.4rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  margin: 4px 0;
+  color: #0f172a;
+}
+
+.transcript-badge {
+  display: inline-block;
+  margin-top: 8px;
+  padding: 4px 18px;
+  border: 1.5px solid #0f172a;
+  border-radius: 999px;
+  font-weight: 800;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  background: #f8fafc;
+}
+
+.transcript-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.8125rem;
+  text-align: center;
+  border: 1px solid #cbd5e1;
+  margin-bottom: 22px;
+}
+
+.transcript-table th {
+  background: #f1f5f9;
+  padding: 7px 10px;
+  border: 1px solid #cbd5e1;
+  font-weight: 800;
+  text-transform: uppercase;
+  font-size: 0.72rem;
+}
+
+.transcript-table td {
+  padding: 6px 10px;
+  border: 1px solid #e2e8f0;
+}

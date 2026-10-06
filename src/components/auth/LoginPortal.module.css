@@ -1,0 +1,833 @@
+.shell {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: minmax(320px, 0.72fr) minmax(0, 1.28fr);
+  background: var(--portal-canvas);
+  color: var(--portal-text);
+  font-family: var(--font-sans);
+}
+
+.brandPanel {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  min-height: 580px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 32px clamp(24px, 4vw, 54px) 22px;
+  background:
+    radial-gradient(ellipse at 85% 50%, rgba(62, 137, 213, 0.2), transparent 28rem),
+    linear-gradient(155deg, var(--portal-brand-start), var(--portal-brand-end));
+  color: #f5f9ff;
+}
+
+.brandPanelTop,
+.brandContent,
+.brandPanelFooter {
+  position: relative;
+  z-index: 1;
+}
+
+.brandPanelTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.brand {
+  display: inline-flex;
+  min-width: 0;
+  align-items: center;
+  gap: 11px;
+}
+
+.brandMark,
+.instituteMark,
+.workspaceIcon {
+  display: grid;
+  flex: 0 0 auto;
+  place-items: center;
+}
+
+.brandMark {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  background: var(--accent-primary);
+  color: #fff;
+}
+
+.brandText {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.brandText strong {
+  font-size: 1.02rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+}
+
+.brandText small {
+  margin-top: 3px;
+  overflow: hidden;
+  color: #b0c1d3;
+  font-size: 0.64rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.languageButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 10px;
+  border: 1px solid rgba(219, 235, 252, 0.23);
+  border-radius: 9px;
+  background: rgba(255, 255, 255, 0.06);
+  color: #edf5fd;
+  font: inherit;
+  font-size: 0.68rem;
+  font-weight: 650;
+  cursor: pointer;
+}
+
+.languageButton:hover {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.languageButton:focus-visible,
+.workspaceCard:focus-visible {
+  outline: 3px solid rgba(79, 143, 247, 0.48);
+  outline-offset: 3px;
+}
+
+.brandContent {
+  width: min(100%, 460px);
+  margin: auto 0;
+  padding: 44px 0;
+}
+
+.eyebrow,
+.sectionEyebrow {
+  color: #9bd7ce;
+  font-size: 0.67rem;
+  font-weight: 750;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}
+
+.brandContent h1 {
+  margin: 17px 0 13px;
+  color: #f8fbff;
+  font-size: clamp(2.3rem, 4vw, 3.4rem);
+  font-weight: 760;
+  line-height: 1.06;
+  letter-spacing: -0.06em;
+}
+
+.brandContent h1 span {
+  color: #9bd7ce;
+}
+
+.brandDescription {
+  max-width: 390px;
+  color: #bdcddd;
+  font-size: 0.86rem;
+  line-height: 1.65;
+}
+
+.campusSummary {
+  max-width: 390px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 30px;
+  padding: 15px;
+  border: 1px solid rgba(229, 240, 252, 0.16);
+  border-radius: 13px;
+  background: rgba(255, 255, 255, 0.055);
+}
+
+.summaryIcon {
+  width: 36px;
+  height: 36px;
+  display: grid;
+  flex: 0 0 auto;
+  place-items: center;
+  border-radius: 10px;
+  background: rgba(124, 182, 244, 0.15);
+  color: #a9d4ff;
+}
+
+.campusSummary > span:last-child {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.campusSummary strong {
+  overflow: hidden;
+  color: #f6faff;
+  font-size: 0.73rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.campusSummary small {
+  color: #a9bdcc;
+  font-size: 0.63rem;
+}
+
+.brandPanelFooter {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 18px;
+  padding-top: 15px;
+  border-top: 1px solid rgba(226, 239, 252, 0.13);
+  color: #c3d4e3;
+  font-size: 0.64rem;
+  font-weight: 600;
+}
+
+.workspacePanel {
+  min-width: 0;
+  min-height: 100vh;
+  padding: 25px clamp(22px, 4vw, 56px) 24px;
+}
+
+.workspaceHeader {
+  min-height: 49px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding-bottom: 17px;
+  border-bottom: 1px solid var(--portal-border);
+}
+
+.instituteMark {
+  width: 35px;
+  height: 35px;
+  border: 1px solid #dbe6f2;
+  border-radius: 10px;
+  background: #fff;
+  color: var(--portal-blue);
+}
+
+.instituteMark img {
+  width: 100%;
+  height: 100%;
+  padding: 3px;
+  border-radius: inherit;
+  object-fit: contain;
+}
+
+.instituteDetails {
+  min-width: 0;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.instituteDetails strong,
+.userSummary strong {
+  overflow: hidden;
+  color: var(--portal-text);
+  font-size: 0.73rem;
+  font-weight: 750;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.instituteDetails > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  color: var(--portal-muted);
+  font-size: 0.6rem;
+}
+
+.instituteDetails i {
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: #a4b2c1;
+}
+
+.userSummary {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: end;
+  gap: 3px;
+  padding-left: 12px;
+  border-left: 1px solid var(--portal-border);
+}
+
+.userSummary > span {
+  color: var(--portal-muted);
+  font-size: 0.56rem;
+}
+
+.signOutButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 4px;
+  padding: 2px 0;
+  border: 0;
+  background: transparent;
+  color: var(--portal-blue);
+  font: inherit;
+  font-size: 0.59rem;
+  font-weight: 650;
+  cursor: pointer;
+}
+
+.signOutButton:focus-visible {
+  outline: 2px solid var(--portal-blue);
+  outline-offset: 2px;
+}
+
+.workspaceContent {
+  width: min(100%, 780px);
+  margin: 0 auto;
+  padding-top: clamp(32px, 6vh, 60px);
+}
+
+.sectionEyebrow {
+  color: var(--portal-blue);
+}
+
+.workspaceIntro h2 {
+  margin-top: 6px;
+  color: var(--portal-text);
+  font-size: clamp(1.6rem, 2.4vw, 2rem);
+  font-weight: 760;
+  line-height: 1.18;
+  letter-spacing: -0.05em;
+}
+
+.workspaceIntro p {
+  margin-top: 7px;
+  color: var(--portal-muted);
+  font-size: 0.78rem;
+  line-height: 1.55;
+}
+
+.searchBox {
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 22px;
+  padding: 0 12px;
+  border: 1px solid var(--portal-border);
+  border-radius: 10px;
+  background: #fff;
+  color: #8090a3;
+}
+
+.searchBox:focus-within {
+  border-color: var(--portal-blue);
+  box-shadow: 0 0 0 3px var(--accent-primary-light);
+}
+
+.searchBox input {
+  min-width: 0;
+  flex: 1;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: var(--portal-text);
+  font: inherit;
+  font-size: 0.71rem;
+}
+
+.searchBox input::placeholder {
+  color: #9aa7b6;
+}
+
+.searchBox > span {
+  color: #8998a9;
+  font-size: 0.61rem;
+}
+
+.resultsLabel {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 22px 1px 10px;
+}
+
+.resultsLabel span:first-child {
+  color: #43566e;
+  font-size: 0.67rem;
+  font-weight: 750;
+}
+
+.resultsLabel span:last-child {
+  color: #98a4b2;
+  font-size: 0.59rem;
+}
+
+.workspaceList {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 9px;
+}
+
+.workspaceCard {
+  min-width: 0;
+  min-height: 64px;
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 11px 13px;
+  border: 1px solid var(--portal-border);
+  border-radius: 11px;
+  background: rgba(255, 255, 255, 0.92);
+  color: var(--portal-text);
+  text-align: left;
+  font-family: inherit;
+  cursor: pointer;
+  transition: border-color 150ms ease, box-shadow 150ms ease, transform 150ms ease;
+}
+
+.workspaceCard:hover {
+  transform: translateY(-1px);
+  border-color: #c4d5e9;
+  box-shadow: 0 7px 18px rgba(31, 62, 98, 0.07);
+}
+
+.workspaceIcon {
+  width: 34px;
+  height: 34px;
+  border-radius: 9px;
+  background: var(--accent-primary-light);
+  color: var(--portal-blue);
+}
+
+.workspaceLabel {
+  min-width: 0;
+  flex: 1;
+  color: #344a63;
+  font-size: 0.72rem;
+  font-weight: 650;
+  line-height: 1.35;
+}
+
+.workspaceArrow {
+  flex: 0 0 auto;
+  color: #94a3b5;
+  transition: color 150ms ease, transform 150ms ease;
+}
+
+.workspaceCard:hover .workspaceArrow {
+  transform: translateX(2px);
+  color: var(--portal-blue);
+}
+
+.emptyState {
+  min-height: 170px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: 1px dashed #d7e0eb;
+  border-radius: 12px;
+  color: #8b9aad;
+  text-align: center;
+}
+
+.emptyState strong {
+  color: #42566e;
+  font-size: 0.77rem;
+}
+
+.emptyState span {
+  font-size: 0.65rem;
+}
+
+.workspaceFootnote {
+  margin-top: 14px;
+  color: #8997a8;
+  font-size: 0.6rem;
+  line-height: 1.5;
+}
+
+@media (max-width: 980px) {
+  .shell {
+    grid-template-columns: minmax(280px, 0.7fr) minmax(0, 1.3fr);
+  }
+
+  .workspaceList {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 760px) {
+  .shell {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .brandPanel {
+    position: relative;
+    height: auto;
+    min-height: 0;
+    padding: 20px 24px;
+  }
+
+  .brandContent {
+    width: min(100%, 620px);
+    margin: 0 auto;
+    padding: 33px 0 22px;
+  }
+
+  .brandContent h1 {
+    font-size: clamp(2.2rem, 7vw, 3.1rem);
+  }
+
+  .campusSummary {
+    margin-top: 20px;
+  }
+
+  .workspacePanel {
+    min-height: 0;
+    padding: 0 24px 25px;
+  }
+
+  .workspaceHeader {
+    padding-top: 15px;
+  }
+
+  .workspaceContent {
+    padding-top: 28px;
+  }
+
+  .workspaceList {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 520px) {
+  .brandPanel {
+    padding: 16px 17px;
+  }
+
+  .brandMark {
+    width: 36px;
+    height: 36px;
+  }
+
+  .brandText small {
+    max-width: 175px;
+    font-size: 0.59rem;
+  }
+
+  .languageButton {
+    gap: 5px;
+    padding: 7px 9px;
+    font-size: 0.64rem;
+  }
+
+  .brandContent {
+    padding: 28px 0 19px;
+  }
+
+  .brandContent h1 {
+    margin-top: 12px;
+    font-size: clamp(2rem, 10vw, 2.65rem);
+  }
+
+  .brandDescription {
+    font-size: 0.76rem;
+  }
+
+  .campusSummary {
+    margin-top: 17px;
+    padding: 12px;
+  }
+
+  .brandPanelFooter {
+    gap: 8px 14px;
+    font-size: 0.59rem;
+  }
+
+  .workspacePanel {
+    padding: 0 17px 21px;
+  }
+
+  .instituteMark {
+    width: 32px;
+    height: 32px;
+  }
+
+  .instituteDetails strong,
+  .userSummary strong {
+    font-size: 0.64rem;
+  }
+
+  .instituteDetails > span,
+  .userSummary > span {
+    font-size: 0.52rem;
+  }
+
+  .userSummary {
+    padding-left: 8px;
+  }
+
+  .signOutButton {
+    font-size: 0.53rem;
+  }
+
+  .workspaceContent {
+    padding-top: 24px;
+  }
+
+  .workspaceIntro h2 {
+    font-size: 1.5rem;
+  }
+
+  .workspaceIntro p {
+    font-size: 0.7rem;
+  }
+
+  .searchBox {
+    min-height: 42px;
+    margin-top: 17px;
+  }
+
+  .workspaceList {
+    grid-template-columns: 1fr;
+    gap: 7px;
+  }
+
+  .workspaceCard {
+    min-height: 58px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .workspaceCard,
+  .workspaceArrow {
+    transition: none;
+  }
+
+  .workspaceCard:hover {
+    transform: none;
+  }
+}
+
+.loginForm {
+  width: min(100%, 460px);
+  display: flex;
+  flex-direction: column;
+  margin-top: 27px;
+}
+
+.formLabel {
+  margin: 0 0 7px;
+  color: #43566e;
+  font-size: 0.69rem;
+  font-weight: 700;
+}
+
+.formInput {
+  min-height: 48px;
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  margin-bottom: 18px;
+  padding: 0 13px;
+  border: 1px solid var(--portal-border);
+  border-radius: 10px;
+  background: #fff;
+  color: #8796a8;
+  transition: border-color 150ms ease, box-shadow 150ms ease;
+}
+
+.formInput:focus-within {
+  border-color: var(--portal-blue);
+  box-shadow: 0 0 0 3px var(--accent-primary-light);
+}
+
+.formInput input {
+  width: 100%;
+  min-width: 0;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: var(--portal-text);
+  font: inherit;
+  font-size: 0.75rem;
+}
+
+.formInput input::placeholder {
+  color: #9aa7b6;
+}
+
+.formError {
+  margin: -3px 0 14px;
+  color: #b42318;
+  font-size: 0.69rem;
+  line-height: 1.45;
+}
+
+.submitButton {
+  min-height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  margin-top: 3px;
+  border: 0;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #1d4ed8, #2563eb);
+  color: #fff;
+  font: inherit;
+  font-size: 0.77rem;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 8px 17px rgba(37, 99, 235, 0.16);
+  transition: transform 150ms ease, box-shadow 150ms ease;
+}
+
+.submitButton:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 11px 22px rgba(37, 99, 235, 0.23);
+}
+
+.submitButton:focus-visible,
+.instituteCard:focus-visible {
+  outline: 3px solid rgba(79, 143, 247, 0.48);
+  outline-offset: 3px;
+}
+
+.demoNotice {
+  width: min(100%, 460px);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 5px 9px;
+  margin-top: 24px;
+  padding: 13px 14px;
+  border: 1px solid #d9e7f5;
+  border-radius: 10px;
+  background: #f4f8fc;
+  color: #63758b;
+  font-size: 0.65rem;
+}
+
+.demoNotice strong {
+  color: #34506f;
+  font-size: 0.67rem;
+}
+
+.demoNotice small {
+  width: 100%;
+  color: #8998a9;
+  font-size: 0.6rem;
+  line-height: 1.5;
+}
+
+.instituteList {
+  display: grid;
+  gap: 10px;
+  margin-top: 25px;
+}
+
+.instituteCard {
+  width: 100%;
+  min-height: 76px;
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  padding: 13px 15px;
+  border: 1px solid var(--portal-border);
+  border-radius: 12px;
+  background: #fff;
+  color: var(--portal-text);
+  text-align: left;
+  font-family: inherit;
+  cursor: pointer;
+  transition: border-color 150ms ease, box-shadow 150ms ease, transform 150ms ease;
+}
+
+.instituteCard:hover {
+  transform: translateY(-1px);
+  border-color: #bdd2ea;
+  box-shadow: 0 8px 20px rgba(31, 62, 98, 0.08);
+}
+
+.instituteCard .workspaceIcon {
+  overflow: hidden;
+}
+
+.instituteCard .workspaceIcon img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  padding: 4px;
+}
+
+.instituteCardText {
+  min-width: 0;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.instituteCardText strong {
+  overflow: hidden;
+  color: #344a63;
+  font-size: 0.75rem;
+  font-weight: 700;
+  line-height: 1.35;
+  text-overflow: ellipsis;
+}
+
+.instituteCardText small {
+  overflow: hidden;
+  color: #8291a3;
+  font-size: 0.61rem;
+  line-height: 1.4;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@media (max-width: 520px) {
+  .formInput {
+    min-height: 45px;
+  }
+
+  .instituteCard {
+    min-height: 69px;
+    padding: 11px;
+  }
+
+  .instituteCardText small {
+    max-width: 225px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .submitButton,
+  .instituteCard {
+    transition: none;
+  }
+
+  .submitButton:hover,
+  .instituteCard:hover {
+    transform: none;
+  }
+}
