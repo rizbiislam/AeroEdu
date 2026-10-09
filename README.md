@@ -30,6 +30,7 @@ https://rizbiislam.github.io/AeroEdu/
 ```
 
 Each push to `frontend` builds and deploys the demo automatically.
+The hosted build uses mock authentication and sample data; it does not connect to the backend.
 
 ## Build
 
