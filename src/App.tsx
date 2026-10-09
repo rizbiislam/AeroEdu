@@ -1,22 +1,30 @@
-import React, { useState } from 'react';
-import { AppProvider, useApp } from './context/AppContext';
+import React, { lazy, Suspense, useState } from 'react';
+import { AppProvider } from './context/AppContext';
+import { useApp } from './context/useApp';
 import { Navbar } from './components/layout/Navbar';
 import { Sidebar } from './components/layout/Sidebar';
-import { OverviewDashboard } from './components/dashboard/OverviewDashboard';
-import { AttendanceView } from './components/attendance/AttendanceView';
-import { ExamAdmitCardView } from './components/examination/ExamAdmitCardView';
-import { BillingFinanceView } from './components/billing/BillingFinanceView';
-import { AcademicGradesView } from './components/grades/AcademicGradesView';
-import { SupportTicketsView } from './components/support/SupportTicketsView';
-import { AuditLogView } from './components/audit/AuditLogView';
-import { StudentIDCardView } from './components/idcard/StudentIDCardView';
-import { ClassRoutineView } from './components/routine/ClassRoutineView';
-import { InstituteAdminHub } from './components/admin/InstituteAdminHub';
-import { InstituteDirectoryView } from './components/admin/InstituteDirectoryView';
 import { LoginPortal } from './components/auth/LoginPortal';
-import { ResultVerificationView } from './components/examination/ResultVerificationView';
-import { WorkspaceView } from './components/operations/WorkspaceView';
-import { PlatformSupportView } from './components/support/PlatformSupportView';
+import { isApiAuthEnabled } from './services/ApiClient';
+
+const OverviewDashboard = lazy(() => import('./components/dashboard/OverviewDashboard').then((module) => ({ default: module.OverviewDashboard })));
+const AttendanceView = lazy(() => import('./components/attendance/AttendanceView').then((module) => ({ default: module.AttendanceView })));
+const ExamAdmitCardView = lazy(() => import('./components/examination/ExamAdmitCardView').then((module) => ({ default: module.ExamAdmitCardView })));
+const BillingFinanceView = lazy(() => import('./components/billing/BillingFinanceView').then((module) => ({ default: module.BillingFinanceView })));
+const AcademicGradesView = lazy(() => import('./components/grades/AcademicGradesView').then((module) => ({ default: module.AcademicGradesView })));
+const SupportTicketsView = lazy(() => import('./components/support/SupportTicketsView').then((module) => ({ default: module.SupportTicketsView })));
+const AuditLogView = lazy(() => import('./components/audit/AuditLogView').then((module) => ({ default: module.AuditLogView })));
+const StudentIDCardView = lazy(() => import('./components/idcard/StudentIDCardView').then((module) => ({ default: module.StudentIDCardView })));
+const ClassRoutineView = lazy(() => import('./components/routine/ClassRoutineView').then((module) => ({ default: module.ClassRoutineView })));
+const InstituteAdminHub = lazy(() => import('./components/admin/InstituteAdminHub').then((module) => ({ default: module.InstituteAdminHub })));
+const InstituteDirectoryView = lazy(() => import('./components/admin/InstituteDirectoryView').then((module) => ({ default: module.InstituteDirectoryView })));
+const ResultVerificationView = lazy(() => import('./components/examination/ResultVerificationView').then((module) => ({ default: module.ResultVerificationView })));
+const WorkspaceView = lazy(() => import('./components/operations/WorkspaceView').then((module) => ({ default: module.WorkspaceView })));
+const PlatformSupportView = lazy(() => import('./components/support/PlatformSupportView').then((module) => ({ default: module.PlatformSupportView })));
+const AssessmentWorkspace = lazy(() => import('./features/assessments/AssessmentWorkspace').then((module) => ({ default: module.AssessmentWorkspace })));
+const InstitutePaymentAccounts = lazy(() => import('./components/admin/InstitutePaymentAccounts').then((module) => ({ default: module.InstitutePaymentAccounts })));
+const RoleAccessWorkspace = lazy(() => import('./components/admin/RoleAccessWorkspace').then((module) => ({ default: module.RoleAccessWorkspace })));
+const AcademicStructureWorkspace = lazy(() => import('./components/academic/AcademicStructureWorkspace').then((module) => ({ default: module.AcademicStructureWorkspace })));
+const StudentRegistryWorkspace = lazy(() => import('./features/students/StudentRegistryWorkspace').then((module) => ({ default: module.StudentRegistryWorkspace })));
 
 const MainAppContent: React.FC = () => {
   const { activeTab, role, t } = useApp();
@@ -33,6 +41,15 @@ const MainAppContent: React.FC = () => {
       case 'institutes':
         return <InstituteDirectoryView />;
 
+      case 'institute_setup':
+        return <InstitutePaymentAccounts />;
+
+      case 'classes':
+        return isApiAuthEnabled ? <AcademicStructureWorkspace /> : <WorkspaceView />;
+
+      case 'role_access':
+        return <RoleAccessWorkspace />;
+
       case 'admin_hub':
         return <InstituteAdminHub />;
 
@@ -41,10 +58,12 @@ const MainAppContent: React.FC = () => {
       case 'guardian_attendance':
         return <AttendanceView />;
 
-      case 'exam_builder':
       case 'admit_cards':
       case 'student_admit':
         return <ExamAdmitCardView />;
+
+      case 'exam_builder':
+        return <AssessmentWorkspace />;
 
       case 'results_publish':
         return <ResultVerificationView />;
@@ -55,7 +74,7 @@ const MainAppContent: React.FC = () => {
       case 'payment_recon':
       case 'student_fees':
       case 'guardian_pay':
-        return <BillingFinanceView />;
+        return <BillingFinanceView key={activeTab} />;
 
       case 'grades':
       case 'student_grades':
@@ -70,16 +89,14 @@ const MainAppContent: React.FC = () => {
 
       case 'id_cards':
       case 'students':
-        return <StudentIDCardView />;
+        return isApiAuthEnabled ? <StudentRegistryWorkspace /> : <StudentIDCardView />;
 
       case 'routine':
       case 'student_routine':
         return <ClassRoutineView />;
 
       case 'staff':
-      case 'classes':
       case 'my_classes':
-      case 'institute_setup':
       case 'communications':
       case 'settings':
       case 'subscription':
@@ -118,7 +135,9 @@ const MainAppContent: React.FC = () => {
           onMenuClick={() => setNavigationOpen((open) => !open)}
         />
         <main className="content-body">
-          {renderActiveView()}
+          <Suspense fallback={<div className="view-loading" role="status">Loading workspace…</div>}>
+            {renderActiveView()}
+          </Suspense>
         </main>
       </div>
     </div>

@@ -49,6 +49,22 @@ export interface User {
   status: 'active' | 'suspended' | 'inactive';
   created_at: string;
   mfa_enabled?: boolean;
+  /** Page IDs returned by the authorization API for this user and institute. */
+  accessible_pages?: string[];
+  /** Action permissions returned by the API; UI checks only, server remains authoritative. */
+  permissions?: string[];
+}
+
+export interface InstitutePaymentAccount {
+  id: string;
+  bank_name: string;
+  account_name: string;
+  account_number: string;
+  branch_name?: string;
+  routing_number?: string;
+  payment_method: 'bank_transfer' | 'bkash' | 'nagad';
+  instructions?: string;
+  is_active: boolean;
 }
 
 export interface Institute {
@@ -78,6 +94,9 @@ export interface Institute {
   white_label_enabled: boolean;
   api_access_enabled: boolean;
   academic_year: string;
+  payment_accounts?: InstitutePaymentAccount[];
+  metadata?: Record<string, unknown>;
+  entitlements?: Record<string, boolean | number | string>;
 }
 
 export interface AcademicClass {
@@ -109,6 +128,13 @@ export interface Subject {
   is_optional: boolean;
   total_marks: number;
   pass_marks: number;
+}
+
+export interface ClassSubjectAssignment {
+  id: string;
+  class_id: string;
+  subject_id: string;
+  teacher_id?: string;
 }
 
 export interface Student {

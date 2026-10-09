@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import { ArrowDownToLine, ArrowUpRight, Building2, Clock3, Headphones, LifeBuoy, Search, ShieldAlert, Star } from 'lucide-react';
-import { useApp } from '../../context/AppContext';
+import { useApp } from '../../context/useApp';
 import styles from './PlatformSupportView.module.css';
 
 const statuses = ['all', 'open', 'in_progress', 'waiting', 'resolved'] as const;

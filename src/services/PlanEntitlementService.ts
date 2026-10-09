@@ -17,8 +17,10 @@ const pageEntitlements: Record<string, string> = {
 };
 
 export class PlanEntitlementService {
-  hasPageEntitlement(plan: PlanTier, pageId: string): boolean {
+  hasPageEntitlement(plan: PlanTier, pageId: string, instituteEntitlements?: Readonly<Record<string, boolean | number | string>>): boolean {
     const featureKey = pageEntitlements[pageId];
-    return !featureKey || demoEntitlements[plan][featureKey] === true;
+    if (!featureKey) return true;
+    if (instituteEntitlements) return instituteEntitlements[featureKey] === true;
+    return demoEntitlements[plan][featureKey] === true;
   }
 }

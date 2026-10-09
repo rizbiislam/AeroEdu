@@ -1,15 +1,7 @@
 import React from 'react';
 import { GraduationCap } from 'lucide-react';
-import { useApp } from '../../context/AppContext';
+import { useApp } from '../../context/useApp';
 import styles from './Sidebar.module.css';
-
-const badgeStyles = {
-  blue: styles.badge_blue,
-  green: styles.badge_green,
-  amber: styles.badge_amber,
-  red: styles.badge_red,
-  purple: styles.badge_purple
-};
 
 interface SidebarProps {
   isOpen: boolean;
@@ -48,11 +40,6 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onNavigate }) => {
             >
               <Icon className={styles.navigationIcon} size={18} aria-hidden="true" />
               <span className={styles.navigationText}>{item.label}</span>
-              {item.badge !== undefined && (
-                <span className={`${styles.badge} ${badgeStyles[item.badgeColor || 'blue']}`}>
-                  {item.badge}
-                </span>
-              )}
             </button>
           );
         })}

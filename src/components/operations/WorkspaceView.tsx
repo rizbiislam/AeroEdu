@@ -4,7 +4,7 @@ import {
   Check, ChevronDown, CircleHelp, CreditCard, KeyRound, LockKeyhole,
   Megaphone, Plus, Search, Settings2, ShieldCheck, Sparkles, Users
 } from 'lucide-react';
-import { useApp } from '../../context/AppContext';
+import { useApp } from '../../context/useApp';
 import type { StaffMember } from '../../types';
 import styles from './WorkspaceView.module.css';
 
@@ -143,7 +143,7 @@ export const WorkspaceView: React.FC = () => {
           <p>{description}</p>
         </div>
         <div className={styles.headerActions}>
-          {['staff', 'classes', 'onboarding', 'communications', 'api_access'].includes(moduleId) && (
+          {(['staff', 'classes', 'onboarding', 'api_access'].includes(moduleId) || (moduleId === 'communications' && !['student', 'guardian'].includes(currentUser.role))) && (
             <button className="btn btn-primary" type="button" onClick={() => ['staff', 'classes'].includes(moduleId) ? setCreateOpen(true) : moduleId === 'communications' ? document.getElementById('workspace-composer')?.focus() : showToast(language === 'bn' ? 'নতুন ফর্ম প্রস্তুত।' : 'The create form is ready.', 'info')}>
               <Plus size={16} /> {moduleId === 'staff' ? words.addStaff : moduleId === 'classes' ? words.addClass : moduleId === 'communications' ? words.post : moduleId === 'api_access' ? words.createKey : words.create}
             </button>
@@ -157,7 +157,7 @@ export const WorkspaceView: React.FC = () => {
       {(moduleId === 'classes' || moduleId === 'my_classes') && <ClassesWorkspace />}
       {moduleId === 'institute_setup' && <InstituteWorkspace />}
       {moduleId === 'communications' && (
-        <CommunicationsWorkspace words={words} language={language} announcements={announcements} postTitle={postTitle} setPostTitle={setPostTitle} postText={postText} setPostText={setPostText} postAudience={postAudience} setPostAudience={setPostAudience} postKind={postKind} setPostKind={setPostKind} publish={publish} />
+        <CommunicationsWorkspace words={words} language={language} announcements={announcements} postTitle={postTitle} setPostTitle={setPostTitle} postText={postText} setPostText={setPostText} postAudience={postAudience} setPostAudience={setPostAudience} postKind={postKind} setPostKind={setPostKind} publish={publish} canPublish={!['student', 'guardian'].includes(currentUser.role)} audienceFilter={currentUser.role === 'student' ? 'students' : currentUser.role === 'guardian' ? 'guardians' : currentUser.role === 'teacher' || currentUser.role === 'class_teacher' ? 'teachers' : 'all'} />
       )}
       {moduleId === 'settings' && <SecurityWorkspace words={words} language={language} mfaEnabled={mfaEnabled} setMfaEnabled={setMfaEnabled} save={save} currentUser={currentUser} />}
       {(moduleId === 'subscription' || moduleId === 'plans') && <PlansWorkspace words={words} language={language} institute={currentInstitute} save={save} />}
@@ -266,19 +266,19 @@ const InstituteWorkspace: React.FC = () => {
   </div>;
 };
 
-const CommunicationsWorkspace: React.FC<{ words: Words; language: 'en' | 'bn'; announcements: ReturnType<typeof useApp>['announcements']; postTitle: string; setPostTitle: (value: string) => void; postText: string; setPostText: (value: string) => void; postAudience: string; setPostAudience: (value: string) => void; postKind: 'announcement' | 'material'; setPostKind: (value: 'announcement' | 'material') => void; publish: () => void }> = ({ words, language, announcements, postTitle, setPostTitle, postText, setPostText, postAudience, setPostAudience, postKind, setPostKind, publish }) => (
+const CommunicationsWorkspace: React.FC<{ words: Words; language: 'en' | 'bn'; announcements: ReturnType<typeof useApp>['announcements']; postTitle: string; setPostTitle: (value: string) => void; postText: string; setPostText: (value: string) => void; postAudience: string; setPostAudience: (value: string) => void; postKind: 'announcement' | 'material'; setPostKind: (value: 'announcement' | 'material') => void; publish: () => void; canPublish: boolean; audienceFilter: string }> = ({ words, language, announcements, postTitle, setPostTitle, postText, setPostText, postAudience, setPostAudience, postKind, setPostKind, publish, canPublish, audienceFilter }) => (
   <div className={styles.communicationGrid}>
     <div className={styles.mainColumn}>
-      <div className={styles.panel}>
+      {canPublish && <div className={styles.panel}>
         <div className={styles.tabBar}><button className={postKind === 'announcement' ? styles.tabActive : ''} type="button" onClick={() => setPostKind('announcement')}><Megaphone size={15} />{words.announcements}</button><button className={postKind === 'material' ? styles.tabActive : ''} type="button" onClick={() => setPostKind('material')}><BookOpen size={15} />{words.materials}</button></div>
         <label className={styles.srOnly} htmlFor="workspace-title-input">{words.subject}</label>
         <input id="workspace-title-input" className={styles.postTitleInput} value={postTitle} onChange={(event) => setPostTitle(event.target.value)} placeholder={language === 'bn' ? 'শিরোনাম লিখুন' : 'Add a clear title'} />
         <label className={styles.srOnly} htmlFor="workspace-composer">{words.postPlaceholder}</label>
         <textarea id="workspace-composer" className={styles.composer} placeholder={words.postPlaceholder} value={postText} onChange={(event) => setPostText(event.target.value)} />
         <div className={styles.composerFooter}><label className={styles.audienceSelect}><span>{words.audience}</span><select value={postAudience} onChange={(event) => setPostAudience(event.target.value)}><option value="all">{words.audienceAll}</option><option value="teachers">{words.audienceTeachers}</option><option value="students">{language === 'bn' ? 'শিক্ষার্থী' : 'Students'}</option><option value="guardians">{words.audienceGuardians}</option></select></label><button className="btn btn-primary" type="button" onClick={publish} disabled={!postTitle.trim() || !postText.trim()}><Megaphone size={15} />{words.post}</button></div>
-      </div>
+      </div>}
       <div className={styles.feedHeader}><div><h2>{words.latest}</h2><p>{language === 'bn' ? 'সাম্প্রতিক ক্যাম্পাস বার্তা ও উপকরণ' : 'Recent campus announcements and resources'}</p></div><button className={styles.filterButton} type="button"><Settings2 size={15} />{words.filters}</button></div>
-      <div className={styles.feed}>{announcements.map((item) => <article className={styles.feedItem} key={item.id}><span className={styles.feedIcon}><Megaphone size={17} /></span><div className={styles.feedBody}><div className={styles.feedMeta}><strong>{item.author_name}</strong><span>{item.created_at}</span></div><h3>{item.title}</h3><p>{item.content}</p><span className={styles.audienceBadge}><Users size={12} />{words.audienceAll}</span></div></article>)}</div>
+      <div className={styles.feed}>{announcements.filter((item) => audienceFilter === 'all' || item.target_audience === 'all' || item.target_audience === audienceFilter).map((item) => <article className={styles.feedItem} key={item.id}><span className={styles.feedIcon}><Megaphone size={17} /></span><div className={styles.feedBody}><div className={styles.feedMeta}><strong>{item.author_name}</strong><span>{item.created_at}</span></div><h3>{item.title}</h3><p>{item.content}</p><span className={styles.audienceBadge}><Users size={12} />{item.target_audience}</span></div></article>)}</div>
     </div>
     <aside className={styles.sideColumn}><div className={styles.sideCard}><h3>{language === 'bn' ? 'প্রকাশনার সংক্ষিপ্তসার' : 'Publishing overview'}</h3><div className={styles.sideStat}><span>{words.published}</span><strong>{announcements.length + 8}</strong></div><div className={styles.sideStat}><span>{words.draft}</span><strong>2</strong></div><div className={styles.sideStat}><span>{language === 'bn' ? 'প্রাপক' : 'Reached this month'}</span><strong>1,248</strong></div><div className={styles.sideFoot}><Bell size={14} />{language === 'bn' ? 'নোটিশ অ্যাপে ও এসএমএসে যায়' : 'Notices reach app and SMS inboxes'}</div></div><div className={styles.sideCard}><h3>{language === 'bn' ? 'লেখার সহায়তা' : 'Before you publish'}</h3><p>{language === 'bn' ? 'গুরুত্বপূর্ণ নোটিশে তারিখ, সময় ও প্রাপক স্পষ্টভাবে উল্লেখ করুন।' : 'Include dates, times, and the intended audience in time-sensitive notices.'}</p><button className={styles.textButton} type="button">{words.learnMore}<ArrowRight size={15} /></button></div></aside>
   </div>

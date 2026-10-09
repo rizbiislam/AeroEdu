@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { ArrowRight, Building2, GraduationCap, Languages, LockKeyhole, LogOut, Mail } from 'lucide-react';
 import type { Institute, User } from '../../types';
-import { useApp } from '../../context/AppContext';
+import { useApp } from '../../context/useApp';
+import { isApiAuthEnabled } from '../../services/ApiClient';
 import styles from './LoginPortal.module.css';
 
 interface LoginPortalProps {
@@ -14,17 +15,26 @@ export const LoginPortal: React.FC<LoginPortalProps> = ({ institutes, user, onSe
   const { language, setLanguage, signIn, logout, t } = useApp();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [instituteSlug, setInstituteSlug] = useState(() => localStorage.getItem('aeroedu.instituteSlug') ?? '');
   const [error, setError] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const isBangla = language === 'bn';
   const isChoosingInstitute = Boolean(user && institutes);
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setError('');
-    const result = signIn(email, password);
-    if (result === 'invalid_credentials') setError(t.portal_login_invalid);
-    else if (result === 'inactive_account') setError(t.portal_login_inactive);
-    else if (result === 'no_institutes') setError(t.portal_login_no_institutes);
+    setIsSubmitting(true);
+    try {
+      const result = await signIn(email, password, instituteSlug);
+      if (result === 'invalid_credentials') setError(t.portal_login_invalid);
+      else if (result === 'inactive_account') setError(t.portal_login_inactive);
+      else if (result === 'no_institutes') setError(t.portal_login_no_institutes);
+      else if (result === 'service_unavailable') setError(t.portal_login_unavailable);
+      else if (isApiAuthEnabled) localStorage.setItem('aeroedu.instituteSlug', instituteSlug.trim());
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -129,6 +139,22 @@ export const LoginPortal: React.FC<LoginPortalProps> = ({ institutes, user, onSe
                 <p>{t.portal_sign_in_description}</p>
               </div>
               <form className={styles.loginForm} onSubmit={handleSubmit}>
+                {isApiAuthEnabled && <>
+                  <label className={styles.formLabel} htmlFor="portal-institute">{t.portal_institute_slug}</label>
+                  <div className={styles.formInput}>
+                    <Building2 size={17} aria-hidden="true" />
+                    <input
+                      id="portal-institute"
+                      type="text"
+                      autoComplete="organization"
+                      value={instituteSlug}
+                      onChange={(event) => setInstituteSlug(event.target.value)}
+                      placeholder="your-school"
+                      pattern="[a-zA-Z0-9-]+"
+                      required
+                    />
+                  </div>
+                </>}
                 <label className={styles.formLabel} htmlFor="portal-email">{t.portal_email_label}</label>
                 <div className={styles.formInput}>
                   <Mail size={17} aria-hidden="true" />
@@ -157,16 +183,16 @@ export const LoginPortal: React.FC<LoginPortalProps> = ({ institutes, user, onSe
                   />
                 </div>
                 {error && <p className={styles.formError} role="alert">{error}</p>}
-                <button className={styles.submitButton} type="submit">
-                  {t.portal_sign_in_button}
+                <button className={styles.submitButton} type="submit" disabled={isSubmitting} aria-busy={isSubmitting}>
+                  {isSubmitting ? t.portal_signing_in : t.portal_sign_in_button}
                   <ArrowRight size={17} />
                 </button>
               </form>
-              <div className={styles.demoNotice}>
+              {!isApiAuthEnabled && <div className={styles.demoNotice}>
                 <strong>{t.portal_demo_label}</strong>
                 <span>{t.portal_demo_credentials}</span>
                 <small>{t.portal_demo_disclaimer}</small>
-              </div>
+              </div>}
             </>
           )}
         </div>

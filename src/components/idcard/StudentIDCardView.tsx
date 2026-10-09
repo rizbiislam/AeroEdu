@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useApp } from '../../context/AppContext';
+import { useApp } from '../../context/useApp';
 import {
   CreditCard,
   Printer,
@@ -39,9 +39,11 @@ export const StudentIDCardView: React.FC = () => {
   const [certDate, setCertDate] = useState('2026-10-04');
 
   const isAdmin = ['super_admin', 'institute_admin', 'academic_director'].includes(role);
+  const isPortal = role === 'student' || role === 'guardian';
+  const visibleStudents = isPortal ? students.filter(s => s.id === 'stu-001') : students;
 
   // Filtered lists
-  const filteredStudents = students.filter(s =>
+  const filteredStudents = visibleStudents.filter(s =>
     s.full_name.toLowerCase().includes(studentSearch.toLowerCase()) ||
     s.admission_no.toLowerCase().includes(studentSearch.toLowerCase()) ||
     String(s.roll_number).includes(studentSearch)
@@ -54,9 +56,9 @@ export const StudentIDCardView: React.FC = () => {
     m.department.toLowerCase().includes(staffSearch.toLowerCase())
   );
 
-  const selectedStudent = students.find(s => s.id === selectedStudentId) || students[0];
+  const selectedStudent = visibleStudents.find(s => s.id === selectedStudentId) || visibleStudents[0];
   const selectedStaff = staff.find(m => m.id === selectedStaffId) || staff[0];
-  const certStudent = students.find(s => s.id === certStudentId) || students[0];
+  const certStudent = visibleStudents.find(s => s.id === certStudentId) || visibleStudents[0];
 
   const handlePrint = () => {
     window.print();
@@ -86,18 +88,18 @@ export const StudentIDCardView: React.FC = () => {
           </p>
         </div>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+        {!isPortal && <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
           <button className="btn btn-secondary" onClick={() => handleDownloadPdf(studioMode)}>
             <Download size={15} /> Export PDF
           </button>
           <button className="btn btn-primary" onClick={handlePrint}>
             <Printer size={15} /> Print Document
           </button>
-        </div>
+        </div>}
       </div>
 
       {/* Mode Selector Tabs */}
-      <div style={{
+      {!isPortal && <div style={{
         display: 'flex',
         alignItems: 'center',
         gap: '8px',
@@ -193,7 +195,7 @@ export const StudentIDCardView: React.FC = () => {
             Official
           </span>
         </button>
-      </div>
+      </div>}
 
       {/* ============================================================== */}
       {/* 1. STUDENT ID CARDS MODE                                       */}
@@ -246,7 +248,7 @@ export const StudentIDCardView: React.FC = () => {
                 gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))',
                 gap: '16px'
               }}>
-                {students.map(s => (
+                {visibleStudents.map(s => (
                   <div
                     key={s.id}
                     style={{
@@ -296,9 +298,9 @@ export const StudentIDCardView: React.FC = () => {
             </div>
           ) : (
             /* Single Student Card Editor & Preview */
-            <div style={{ display: 'grid', gridTemplateColumns: '320px 1fr', gap: '22px', alignItems: 'start' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: isPortal ? '1fr' : '320px 1fr', gap: '22px', alignItems: 'start' }}>
               {/* Student Selector */}
-              <div className="card" style={{ padding: 0, overflow: 'hidden' }}>
+              {!isPortal && <div className="card" style={{ padding: 0, overflow: 'hidden' }}>
                 <div style={{
                   padding: '14px 16px',
                   borderBottom: '1px solid var(--border-subtle)',
@@ -373,7 +375,7 @@ export const StudentIDCardView: React.FC = () => {
                     );
                   })}
                 </div>
-              </div>
+              </div>}
 
               {/* Student Card Visual Preview (Front & Back) */}
               <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
@@ -621,7 +623,7 @@ export const StudentIDCardView: React.FC = () => {
       {/* ============================================================== */}
       {/* 2. TEACHER & STAFF ID CARDS MODE                               */}
       {/* ============================================================== */}
-      {studioMode === 'staff' && (
+      {!isPortal && studioMode === 'staff' && (
         <div style={{ display: 'grid', gridTemplateColumns: '320px 1fr', gap: '22px', alignItems: 'start' }}>
           {/* Staff Member List */}
           <div className="card" style={{ padding: 0, overflow: 'hidden' }}>
@@ -958,7 +960,7 @@ export const StudentIDCardView: React.FC = () => {
       {/* ============================================================== */}
       {/* 3. OFFICIAL CERTIFICATES & TC MODE                             */}
       {/* ============================================================== */}
-      {studioMode === 'certificates' && (
+      {!isPortal && studioMode === 'certificates' && (
         <div style={{ display: 'grid', gridTemplateColumns: '340px 1fr', gap: '22px', alignItems: 'start' }}>
           {/* Controls & Configuration */}
           <div className="card" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
@@ -994,7 +996,7 @@ export const StudentIDCardView: React.FC = () => {
                 onChange={(e) => setCertStudentId(e.target.value)}
                 style={{ width: '100%', fontSize: '0.85rem' }}
               >
-                {students.map(s => (
+                {visibleStudents.map(s => (
                   <option key={s.id} value={s.id}>
                     Roll {s.roll_number}: {s.full_name} ({s.class_name})
                   </option>

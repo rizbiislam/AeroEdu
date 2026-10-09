@@ -1,5 +1,5 @@
 import type { 
-  Institute, User, Student, StaffMember, AcademicClass, Section, Subject, Exam, 
+  Institute, User, Student, StaffMember, AcademicClass, Section, Subject, ClassSubjectAssignment, Exam, 
   ExamScheduleItem, AdmitCard, MarkEntry, FeeStructure, Invoice, 
   FeeWaiverRequest, PaymentTransaction, RoutineItem, Announcement, 
   StudyMaterial, AuditLog, SupportTicket, KnowledgeArticle, LoginHistoryItem,
@@ -31,6 +31,10 @@ export const mockInstitutes: Institute[] = [
     white_label_enabled: true,
     api_access_enabled: true,
     academic_year: "2026-2027",
+    payment_accounts: [
+      { id: 'acct-1', bank_name: 'Dutch-Bangla Bank PLC', account_name: 'Dhaka National Model Academy', account_number: '105.123.45678', branch_name: 'Uttara Branch', routing_number: '090264634', payment_method: 'bank_transfer', instructions: 'Use student ID as payment reference.', is_active: true },
+      { id: 'acct-2', bank_name: 'bKash', account_name: 'Dhaka National Model Academy', account_number: '01700000000', payment_method: 'bkash', instructions: 'Send money and include student ID in reference.', is_active: true }
+    ],
     seal_url: "https://images.unsplash.com/photo-1599305445671-ac291c95aaa9?w=100&auto=format&fit=crop&q=80",
     signature_url: "https://images.unsplash.com/photo-1579783902614-a3fb3927b675?w=120&auto=format&fit=crop&q=80"
   },
@@ -57,7 +61,10 @@ export const mockInstitutes: Institute[] = [
     sms_cap: 5000,
     white_label_enabled: false,
     api_access_enabled: false,
-    academic_year: "2026-2027"
+    academic_year: "2026-2027",
+    payment_accounts: [
+      { id: 'acct-3', bank_name: 'Sonali Bank PLC', account_name: 'Chittagong Grammar School & College', account_number: '220.987.654321', branch_name: 'Nasirabad Branch', payment_method: 'bank_transfer', instructions: 'Include student ID in the transfer note.', is_active: true }
+    ]
   },
   {
     id: "d1e2f3a4-5678-90ab-cdef-1234567890ab",
@@ -82,7 +89,8 @@ export const mockInstitutes: Institute[] = [
     sms_cap: 500,
     white_label_enabled: false,
     api_access_enabled: false,
-    academic_year: "2026-2027"
+    academic_year: "2026-2027",
+    payment_accounts: []
   }
 ];
 
@@ -109,6 +117,40 @@ export const mockUsers: Record<string, User> = {
     status: "active",
     created_at: "2025-02-01T00:00:00Z",
     mfa_enabled: true
+  },
+  institute_admin_growth: {
+    id: "usr-admin-growth-001",
+    institute_id: "c7a8b9c0-1234-5678-9abc-def012345678",
+    full_name: "Dr. Farhana Rahman (Institute Admin)",
+    email: "admin@cgs.edu.bd",
+    role: "institute_admin",
+    hierarchy_level: 90,
+    status: "active",
+    created_at: "2025-02-01T00:00:00Z",
+    mfa_enabled: true
+  },
+  institute_admin_starter: {
+    id: "usr-admin-starter-001",
+    institute_id: "d1e2f3a4-5678-90ab-cdef-1234567890ab",
+    full_name: "Ms. Ayesha Karim (Institute Admin)",
+    email: "admin@scholars.edu.bd",
+    role: "institute_admin",
+    hierarchy_level: 90,
+    status: "active",
+    created_at: "2025-02-01T00:00:00Z",
+    mfa_enabled: true
+  },
+  academic_director: {
+    id: "usr-director-001",
+    institute_id: "e2fdedee-31b8-4c93-b587-af346f419b50",
+    full_name: "Prof. Nusrat Jahan (Academic Director)",
+    email: "director@dhakamodel.edu.bd",
+    phone: "+880 1713-222333",
+    role: "academic_director",
+    hierarchy_level: 80,
+    status: "active",
+    created_at: "2025-02-03T00:00:00Z",
+    mfa_enabled: false
   },
   exam_controller: {
     id: "usr-exam-001",
@@ -156,6 +198,18 @@ export const mockUsers: Record<string, User> = {
     hierarchy_level: 40,
     status: "active",
     created_at: "2025-02-18T00:00:00Z",
+    mfa_enabled: false
+  },
+  receptionist: {
+    id: "usr-reception-001",
+    institute_id: "e2fdedee-31b8-4c93-b587-af346f419b50",
+    full_name: "Sadia Akhter (Receptionist)",
+    email: "reception@dhakamodel.edu.bd",
+    phone: "+880 1714-111222",
+    role: "receptionist",
+    hierarchy_level: 30,
+    status: "active",
+    created_at: "2025-02-20T00:00:00Z",
     mfa_enabled: false
   },
   student: {
@@ -336,6 +390,14 @@ export const mockSubjects: Subject[] = [
   { id: "sub-137", code: "137", name: "Chemistry", name_bn: "রসায়ন", is_optional: false, total_marks: 100, pass_marks: 33 },
   { id: "sub-138", code: "138", name: "Biology", name_bn: "জীববিজ্ঞান", is_optional: false, total_marks: 100, pass_marks: 33 },
   { id: "sub-154", code: "154", name: "Information & Communication Tech", name_bn: "তথ্য ও যোগাযোগ প্রযুক্তি", is_optional: false, total_marks: 50, pass_marks: 17 }
+];
+
+// Preview fixture for class-subject enrollment. Production will load these mappings from the academic API.
+export const mockClassSubjects: ClassSubjectAssignment[] = [
+  ...['sub-101', 'sub-107', 'sub-109'].map((subject_id) => ({ id: `cs-cls09-${subject_id}`, class_id: 'cls-09', subject_id })),
+  ...['sub-101', 'sub-107', 'sub-109', 'sub-136', 'sub-137', 'sub-138', 'sub-154'].map((subject_id) => ({ id: `cs-cls10-${subject_id}`, class_id: 'cls-10', subject_id })),
+  ...['sub-101', 'sub-107', 'sub-109', 'sub-136', 'sub-137', 'sub-138', 'sub-154'].map((subject_id) => ({ id: `cs-cls11-${subject_id}`, class_id: 'cls-11', subject_id })),
+  ...['sub-101', 'sub-107', 'sub-109', 'sub-136', 'sub-137', 'sub-138', 'sub-154'].map((subject_id) => ({ id: `cs-cls12-${subject_id}`, class_id: 'cls-12', subject_id }))
 ];
 
 export const mockStudents: Student[] = [
@@ -1302,4 +1364,3 @@ export const mockBoardCompliance: BoardComplianceRecord[] = [
     fees_cleared: false
   }
 ];
-

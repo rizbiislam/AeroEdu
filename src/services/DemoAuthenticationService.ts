@@ -1,5 +1,6 @@
 import { mockInstitutes, mockUsers } from '../constants/mockData';
 import type { Institute, User } from '../types';
+import { getDemoNavigationForRole } from '../config/roleNavigation';
 
 const DEMO_PASSWORD = 'aeroedu-demo';
 
@@ -30,6 +31,13 @@ export class DemoAuthenticationService {
       return { ok: false, reason: 'no_institutes' };
     }
 
-    return { ok: true, user, institutes };
+    const demoUser: User = {
+      ...user,
+      accessible_pages: [...getDemoNavigationForRole(user.role)],
+      permissions: user.hierarchy_level >= 90
+        ? ['institute.settings.edit', 'billing.settings.edit']
+        : []
+    };
+    return { ok: true, user: demoUser, institutes };
   }
 }

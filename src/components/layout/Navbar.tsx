@@ -1,7 +1,7 @@
 import React from 'react';
 import { Bell, Building2, CheckCheck, Languages, LogOut, Menu, Moon, Search, Sun, X } from 'lucide-react';
 import { useMemo, useState } from 'react';
-import { useApp } from '../../context/AppContext';
+import { useApp } from '../../context/useApp';
 import styles from './Navbar.module.css';
 
 interface NavbarProps {

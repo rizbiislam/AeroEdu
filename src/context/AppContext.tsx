@@ -1,23 +1,24 @@
 // AeroEdu App State & Reactive Store
-import React, { createContext, useContext, useState, useEffect } from 'react';
-import { CircleHelp } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { AppContext } from './AppContextValue';
 import type { 
-  RoleType, Language, Institute, User, Student, StaffMember, AcademicClass, Exam,
+  RoleType, Language, Institute, User, Student, StaffMember, AcademicClass, Section, Subject, ClassSubjectAssignment, Exam,
   ExamScheduleItem, AdmitCard, MarkEntry, Invoice, FeeWaiverRequest, 
   PaymentTransaction, AuditLog, SupportTicket, RoutineItem, Announcement,
   StudentAcademicResult, AdmissionApplication, TeacherLeaveRequest, BoardComplianceRecord
 } from '../types';
 import { 
-  mockInstitutes, mockUsers, mockStudents, mockStaff, mockClasses, mockExams, mockExamSchedules,
+  mockInstitutes, mockUsers, mockStudents, mockStaff, mockClasses, mockSections, mockSubjects, mockClassSubjects, mockExams, mockExamSchedules,
   mockAdmitCards, mockMarks, mockInvoices, mockFeeWaivers, mockPayments, 
   mockAuditLogs, mockSupportTickets, mockRoutine, mockAnnouncements,
   mockAcademicResults, mockAdmissions, mockTeacherLeaves, mockBoardCompliance
 } from '../constants/mockData';
 import { translations } from '../constants/translations';
-import { getNavItemsForRole, type NavItem } from '../config/roleNavigation';
+import { getDemoNavigationForRole, getNavigationForPages, type NavItem } from '../config/roleNavigation';
 import { WorkspaceAccessService } from '../services/WorkspaceAccessService';
 import { PlanEntitlementService } from '../services/PlanEntitlementService';
 import { DemoAuthenticationService } from '../services/DemoAuthenticationService';
+import { apiClient, ApiError, isApiAuthEnabled, type ApiInstitute, type ApiUser } from '../services/ApiClient';
 import confetti from 'canvas-confetti';
 import { AcademicResultEntity } from '../models/AcademicResultEntity';
 
@@ -27,7 +28,7 @@ interface Toast {
   message: string;
 }
 
-interface AppContextType {
+export interface AppContextType {
   role: RoleType;
   language: Language;
   setLanguage: (lang: Language) => void;
@@ -42,12 +43,17 @@ interface AppContextType {
   setActiveTab: (tab: string) => void;
   availableWorkspaces: NavItem[];
   openWorkspace: (pageId: string) => void;
+  can: (permission: string) => boolean;
+  updateInstitute: (patch: Partial<Institute>) => void;
   t: typeof translations['en'];
 
   // Data states
   students: Student[];
   staff: StaffMember[];
   academicClasses: AcademicClass[];
+  sections: Section[];
+  subjects: Subject[];
+  classSubjects: ClassSubjectAssignment[];
   exams: Exam[];
   examSchedules: ExamScheduleItem[];
   admitCards: AdmitCard[];
@@ -67,7 +73,7 @@ interface AppContextType {
 
   // Auth lifecycle
   isAuthenticated: boolean;
-  signIn: (email: string, password: string) => 'invalid_credentials' | 'inactive_account' | 'no_institutes' | null;
+  signIn: (email: string, password: string, instituteSlug: string) => Promise<'invalid_credentials' | 'inactive_account' | 'no_institutes' | 'service_unavailable' | null>;
   logout: () => void;
 
   // Actions
@@ -96,8 +102,6 @@ interface AppContextType {
   dismissToast: (id: string) => void;
 }
 
-const AppContext = createContext<AppContextType | undefined>(undefined);
-
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [role, setRoleState] = useState<RoleType>('institute_admin');
   const [authenticatedUser, setAuthenticatedUser] = useState<User | null>(null);
@@ -112,6 +116,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [students] = useState<Student[]>(mockStudents);
   const [staff, setStaff] = useState<StaffMember[]>(mockStaff);
   const [academicClasses, setAcademicClasses] = useState<AcademicClass[]>(mockClasses);
+  const [sections] = useState<Section[]>(mockSections);
+  const [subjects] = useState<Subject[]>(mockSubjects);
+  const [classSubjects] = useState<ClassSubjectAssignment[]>(mockClassSubjects);
   const [exams, setExams] = useState<Exam[]>(mockExams);
   const [examSchedules] = useState<ExamScheduleItem[]>(mockExamSchedules);
   const [admitCards] = useState<AdmitCard[]>(mockAdmitCards);
@@ -150,12 +157,17 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     document.documentElement.setAttribute('data-theme', theme);
   }, [theme]);
 
+  useEffect(() => {
+    document.documentElement.style.setProperty('--institute-accent', currentInstitute.primary_color || '#4f8ff7');
+    document.documentElement.dataset.instituteId = currentInstitute.id;
+  }, [currentInstitute.id, currentInstitute.primary_color]);
+
   const toggleTheme = () => {
     setTheme(prev => prev === 'dark' ? 'light' : 'dark');
   };
 
   const showToast = (message: string, type: 'success' | 'error' | 'info' = 'success') => {
-    const id = Math.random().toString(36).substring(2, 9);
+    const id = crypto.randomUUID();
     setToasts(prev => [...prev, { id, type, message }]);
     setTimeout(() => {
       dismissToast(id);
@@ -169,20 +181,19 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const currentUser = authenticatedUser || mockUsers[role] || mockUsers['institute_admin'];
   const t = translations[language];
   // The local demo derives page access from role navigation; production auth should supply API page IDs.
-  const roleNavigation = getNavItemsForRole(role, t, {
-    pendingWaivers: feeWaivers.filter(waiver => waiver.status === 'pending').length,
-    openTickets: supportTickets.filter(ticket => ticket.status === 'open').length,
-    pendingAdminActions:
-      admissions.filter(application => application.status === 'pending' || application.status === 'interview_scheduled').length +
-      teacherLeaves.filter(leave => leave.status === 'pending').length
-  });
-  const commonNavigation = [...roleNavigation, { id: 'knowledge_base', label: t.nav_kb, icon: CircleHelp }];
+  const pageIds = currentUser.accessible_pages ?? getDemoNavigationForRole(role);
+  const roleNavigation = getNavigationForPages(pageIds, t, role);
   const entitlementService = new PlanEntitlementService();
   const planNavigation = role === 'super_admin'
-    ? commonNavigation
-    : commonNavigation.filter(item => entitlementService.hasPageEntitlement(currentInstitute.current_plan, item.id));
+    ? roleNavigation
+    : roleNavigation.filter(item => entitlementService.hasPageEntitlement(currentInstitute.current_plan, item.id, currentInstitute.entitlements));
   const workspaceAccess = new WorkspaceAccessService(planNavigation.map(item => item.id));
   const availableWorkspaces = workspaceAccess.getAvailableWorkspaces(planNavigation);
+  const can = (permission: string) => currentUser.permissions?.includes(permission) ?? false;
+  const updateInstitute = (patch: Partial<Institute>) => {
+    setCurrentInstitute((previous) => ({ ...previous, ...patch }));
+    setAvailableInstitutes((previous) => previous.map((item) => item.id === currentInstitute.id ? { ...item, ...patch } : item));
+  };
 
   const setActiveTab = (pageId: string) => {
     if (!workspaceAccess.canAccess(pageId)) {
@@ -436,7 +447,31 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     showToast(`Thank you! CSAT rating of ${rating}/5 submitted.`, 'success');
   };
 
-  const signIn = (email: string, password: string) => {
+  const signIn = async (email: string, password: string, instituteSlug: string) => {
+    if (isApiAuthEnabled) {
+      try {
+        const session = await apiClient.login(email, password, instituteSlug.trim());
+        const institute = await apiClient.getCurrentInstitute();
+        const user = mapApiUser(session.user, session.accessible_pages, session.permissions);
+        const mappedInstitute = mapApiInstitute(institute);
+        setAuthenticatedUser(user);
+        setRoleState(user.role);
+        setCurrentInstitute(mappedInstitute);
+        setAvailableInstitutes([mappedInstitute]);
+        setHasSelectedInstitute(true);
+        setLandingTab(user.role);
+        setIsAuthenticated(true);
+        return null;
+      } catch (error) {
+        if (error instanceof ApiError) {
+          if (error.code === 'INVALID_CREDENTIALS' || error.status === 401) return 'invalid_credentials';
+          if (error.code === 'NO_ACTIVE_ROLE' || error.status === 403) return 'inactive_account';
+          if (error.code === 'INSTITUTE_REQUIRED') return 'no_institutes';
+        }
+        return 'service_unavailable';
+      }
+    }
+
     const result = new DemoAuthenticationService().authenticate(email, password);
     if (!result.ok) return result.reason;
 
@@ -468,6 +503,25 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     else setActiveTabState('overview');
   };
 
+  useEffect(() => {
+    if (!isApiAuthEnabled) return;
+    let cancelled = false;
+    void apiClient.restoreSession().then(async (session) => {
+      const institute = await apiClient.getCurrentInstitute();
+      if (cancelled) return;
+      const user = mapApiUser(session.user, session.accessible_pages, session.permissions);
+      const mappedInstitute = mapApiInstitute(institute);
+      setAuthenticatedUser(user);
+      setRoleState(user.role);
+      setCurrentInstitute(mappedInstitute);
+      setAvailableInstitutes([mappedInstitute]);
+      setHasSelectedInstitute(true);
+      setLandingTab(user.role);
+      setIsAuthenticated(true);
+    }).catch(() => undefined);
+    return () => { cancelled = true; };
+  }, []);
+
   const selectInstitute = (instituteId: string) => {
     const institute = availableInstitutes.find((item) => item.id === instituteId);
     if (!institute) {
@@ -482,6 +536,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   };
 
   const logout = () => {
+    if (isApiAuthEnabled) void apiClient.logout().catch(() => undefined);
     setIsAuthenticated(false);
     setAuthenticatedUser(null);
     setAvailableInstitutes([]);
@@ -530,10 +585,15 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       setActiveTab,
       availableWorkspaces,
       openWorkspace,
+      can,
+      updateInstitute,
       t,
       students,
       staff,
       academicClasses,
+      sections,
+      subjects,
+      classSubjects,
       exams,
       examSchedules,
       admitCards,
@@ -581,8 +641,35 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   );
 };
 
-export const useApp = () => {
-  const context = useContext(AppContext);
-  if (!context) throw new Error("useApp must be used within AppProvider");
-  return context;
-};
+function mapApiUser(user: ApiUser, accessiblePages: string[], permissions: string[]): User {
+  return {
+    id: user.id,
+    institute_id: user.institute_id,
+    full_name: user.full_name,
+    email: user.email,
+    phone: user.phone,
+    role: user.role as RoleType,
+    hierarchy_level: user.hierarchy_level,
+    status: user.status,
+    created_at: new Date().toISOString(),
+    accessible_pages: accessiblePages,
+    permissions,
+  };
+}
+
+function mapApiInstitute(institute: ApiInstitute): Institute {
+  return {
+    ...mockInstitutes[0],
+    id: institute.id,
+    name: institute.name,
+    slug: institute.slug,
+    institute_type: institute.institute_type as Institute['institute_type'],
+    eiin: institute.eiin,
+    logo_url: institute.logo_url,
+    seal_url: institute.seal_url,
+    address: institute.address,
+    contact_email: institute.contact_email,
+    contact_phone: institute.contact_phone,
+    status: institute.status as Institute['status'],
+  };
+}

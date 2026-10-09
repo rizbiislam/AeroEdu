@@ -22,9 +22,11 @@
   --text-dim: #8899b4;
 
   /* Primary Accent Palette */
-  --accent-primary: #4f8ff7;
+  --institute-accent: #4f8ff7;
+  --accent-primary: var(--institute-accent);
   --accent-primary-hover: #3374e0;
-  --accent-primary-light: rgba(79, 143, 247, 0.16);
+  --accent-primary-light: color-mix(in srgb, var(--accent-primary) 16%, transparent);
+  --accent-primary-border: color-mix(in srgb, var(--accent-primary) 30%, transparent);
   --accent-cyan: #22d3ee;
   --accent-cyan-light: rgba(34, 211, 238, 0.14);
   --accent-success: #22c55e;
@@ -159,6 +161,14 @@ body {
   max-width: 1600px;
   width: 100%;
   margin: 0 auto;
+}
+
+.view-loading {
+  min-height: 42vh;
+  display: grid;
+  place-items: center;
+  color: var(--text-muted);
+  font-size: 0.85rem;
 }
 
 .navigation-backdrop {

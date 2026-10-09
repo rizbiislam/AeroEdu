@@ -1,46 +1,33 @@
-# AeroEdu Frontend Demo
+# AeroEdu Frontend
 
-A responsive, bilingual (English/Bengali) frontend prototype for a centralized education platform.
+Responsive React and TypeScript interface for the AeroEdu multi-institute education platform.
 
-## Demo access
+## Run with the local API
 
-This preview uses mock authentication and in-memory sample data. It is not connected to a production backend and must not be used for real accounts, student records, payments, or authorization.
-
-- Multi-institute preview: `ops@aeroedu.app`
-- Password: `aeroedu-demo`
-- Single-institute preview: `teacher@dhakamodel.edu.bd`
-- Password: `aeroedu-demo`
-
-The super-admin demo account can select from the sample institutes. Other demo accounts open the institute linked to that sample account.
-
-## Run locally
+Start Django at `http://127.0.0.1:8000`, configure the local PostgreSQL database, and apply backend migrations first. Then:
 
 ```bash
 npm ci
+cp .env.example .env
+```
+
+Change `VITE_AUTH_MODE=demo` to `VITE_AUTH_MODE=api` in `.env`, then start Vite:
+
+```bash
 npm run dev
 ```
 
-## Build and preview
+The login asks for the institute slug, email, and password. Vite forwards `/api/*` to the local Django server. Refresh tokens stay in an HttpOnly cookie; the short lived access token stays in memory.
+
+## Demo preview
+
+Set `VITE_AUTH_MODE=demo` to use the sample accounts and in-memory sample data. Demo mode is for UI preview only; it does not represent stored school records or server-enforced permissions. Sample credentials are listed in the sign-in panel.
+
+## Build
 
 ```bash
-npm run build:pages
-npm run preview
+npm run build
+npm run lint
 ```
 
-`npm run build:pages` builds the static demo bundle. `npm run build` additionally runs the repository-wide TypeScript check, which currently reports existing errors in unrelated admin, grades, and model files.
-
-## GitHub Pages
-
-The included GitHub Actions workflow enables GitHub Pages and deploys the static frontend when changes are pushed to `main`. It expects this repository name:
-
-```text
-aeroedu-frontend-demo
-```
-
-The site will be available at:
-
-```text
-https://rksoftbd123-coder.github.io/aeroedu-frontend-demo/
-```
-
-All data and credentials shown in this public demo are mock values. Do not add real personal data, API keys, or secrets.
+Some academic screens still use sample data. Authentication and institute resolution support the API mode; feature collections are being moved to their documented APIs incrementally.

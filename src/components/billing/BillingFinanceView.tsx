@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useApp } from '../../context/AppContext';
+import { useApp } from '../../context/useApp';
 import {
   CreditCard,
   CheckCircle,
@@ -10,15 +10,18 @@ import {
 import confetti from 'canvas-confetti';
 
 export const BillingFinanceView: React.FC = () => {
-  const { invoices, feeWaivers, approveWaiver, rejectWaiver, payments, reconcilePayment, showToast } = useApp();
-  const [activeSubTab, setActiveSubTab] = useState<'invoices' | 'waivers' | 'gateway'>('invoices');
+  const { invoices, feeWaivers, approveWaiver, rejectWaiver, payments, reconcilePayment, showToast, role, activeTab } = useApp();
+  const isPortalUser = role === 'student' || role === 'guardian';
+  const visibleInvoices = isPortalUser ? invoices.filter((invoice) => invoice.student_id === 'stu-001') : invoices;
+  const [activeSubTab, setActiveSubTab] = useState<'invoices' | 'waivers' | 'gateway'>(activeTab === 'waiver_queue' ? 'waivers' : activeTab === 'payment_recon' ? 'gateway' : 'invoices');
 
-  const totalDues = invoices.filter(i => i.status !== 'paid').reduce((s, i) => s + i.total_amount, 0);
-  const totalCollected = invoices.filter(i => i.status === 'paid').reduce((s, i) => s + i.total_amount, 0);
+
+  const totalDues = visibleInvoices.filter(i => i.status !== 'paid').reduce((s, i) => s + i.total_amount, 0);
+  const totalCollected = visibleInvoices.filter(i => i.status === 'paid').reduce((s, i) => s + i.total_amount, 0);
 
   const simulateBkashPay = (_invoiceId: string) => {
     confetti({ particleCount: 90, spread: 70, origin: { y: 0.6 } });
-    showToast(`bKash Instant Payment (TrxID: BK${Date.now().toString().slice(-8)}) verified & reconciled!`, 'success');
+    showToast('Demo payment verified in preview.', 'success');
   };
 
   return (
@@ -29,7 +32,7 @@ export const BillingFinanceView: React.FC = () => {
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
             <CreditCard size={24} style={{ color: '#fbbf24' }} />
             <h1 style={{ fontSize: '1.35rem', fontWeight: 800, margin: 0 }}>
-              Fees, Invoicing & Gateway Reconciliation
+              {isPortalUser ? 'My fees & payments' : 'Fees, Invoicing & Gateway Reconciliation'}
             </h1>
             <span className="badge badge-amber">FinTech Ready</span>
           </div>
@@ -39,21 +42,21 @@ export const BillingFinanceView: React.FC = () => {
         </div>
 
         {/* Tab Switchers */}
-        <div style={{ display: 'flex', gap: '8px', background: 'var(--bg-surface)', padding: '4px', borderRadius: '10px', border: '1px solid var(--border-subtle)' }}>
+        {!isPortalUser && <div style={{ display: 'flex', gap: '8px', background: 'var(--bg-surface)', padding: '4px', borderRadius: '10px', border: '1px solid var(--border-subtle)' }}>
           <button
             className={`btn ${activeSubTab === 'invoices' ? 'btn-primary' : 'btn-secondary'}`}
             style={{ padding: '6px 14px', fontSize: '0.8125rem' }}
             onClick={() => setActiveSubTab('invoices')}
           >
-            Invoices ({invoices.length})
+            Invoices ({visibleInvoices.length})
           </button>
-          <button
+          {role !== 'accountant' && <button
             className={`btn ${activeSubTab === 'waivers' ? 'btn-primary' : 'btn-secondary'}`}
             style={{ padding: '6px 14px', fontSize: '0.8125rem' }}
             onClick={() => setActiveSubTab('waivers')}
           >
             Fee Waivers ({feeWaivers.filter(w => w.status === 'pending').length} Pending)
-          </button>
+          </button>}
           <button
             className={`btn ${activeSubTab === 'gateway' ? 'btn-primary' : 'btn-secondary'}`}
             style={{ padding: '6px 14px', fontSize: '0.8125rem' }}
@@ -61,11 +64,11 @@ export const BillingFinanceView: React.FC = () => {
           >
             Gateway Log ({payments.length})
           </button>
-        </div>
+        </div>}
       </div>
 
       {/* Stats Summary */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '16px' }}>
+      {!isPortalUser && <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '16px' }}>
         <div className="card" style={{ borderLeft: '4px solid #10b981' }}>
           <div style={{ fontSize: '0.72rem', color: 'var(--text-dim)', textTransform: 'uppercase', fontWeight: 700, marginBottom: '4px' }}>
             Total Collected
@@ -92,7 +95,7 @@ export const BillingFinanceView: React.FC = () => {
             bKash, Nagad, Sonali Bank
           </div>
         </div>
-      </div>
+      </div>}
 
       {/* Tab 1: Invoices */}
       {activeSubTab === 'invoices' && (
@@ -116,7 +119,7 @@ export const BillingFinanceView: React.FC = () => {
                 </tr>
               </thead>
               <tbody>
-                {invoices.map((inv) => (
+                {visibleInvoices.map((inv) => (
                   <tr 
                     key={inv.id}
                     style={{ borderBottom: '1px solid var(--border-subtle)' }}
@@ -144,7 +147,7 @@ export const BillingFinanceView: React.FC = () => {
                       </span>
                     </td>
                     <td style={{ padding: '14px 18px', textAlign: 'right' }}>
-                      {inv.status !== 'paid' ? (
+                      {isPortalUser && inv.status !== 'paid' ? (
                         <button
                           className="btn btn-primary"
                           style={{ padding: '5px 10px', fontSize: '0.75rem' }}
