@@ -276,3 +276,82 @@
     animation: none;
   }
 }
+
+.searchShell,
+.notificationShell {
+  position: relative;
+  display: flex;
+  align-items: center;
+  z-index: 42;
+}
+
+.searchInput {
+  width: clamp(150px, 19vw, 245px);
+  height: 38px;
+  margin-right: -7px;
+  padding: 0 35px 0 12px;
+  border: 1px solid var(--border-medium);
+  border-radius: 10px;
+  outline: none;
+  background: var(--bg-card);
+  color: var(--text-main);
+  font: inherit;
+  font-size: .7rem;
+  box-shadow: var(--shadow-card);
+}
+
+.searchInput:focus { border-color: var(--accent-primary); }
+.searchShell:has(.searchInput) > .iconButton { margin-left: -37px; border-color: transparent; background: transparent; }
+
+.searchResults,
+.notificationPanel {
+  position: absolute;
+  top: calc(100% + 11px);
+  right: 0;
+  z-index: 45;
+  width: 300px;
+  overflow: hidden;
+  border: 1px solid var(--border-subtle);
+  border-radius: 13px;
+  background: var(--bg-card);
+  box-shadow: 0 18px 45px rgba(23, 37, 59, .16);
+}
+
+.searchResults { padding: 5px; }
+.searchResults > button { display: flex; width: 100%; align-items: center; gap: 10px; padding: 10px; border: 0; border-radius: 8px; background: transparent; color: var(--text-muted); font: inherit; font-size: .72rem; text-align: left; cursor: pointer; }
+.searchResults > button:hover { background: var(--bg-surface); color: var(--accent-primary); }
+.noSearchResults { display: block; padding: 14px; color: var(--text-dim); font-size: .7rem; }
+.notificationDot { position: absolute; top: -4px; right: -4px; display: grid; min-width: 17px; height: 17px; padding: 0 4px; place-items: center; border: 2px solid var(--bg-sidebar); border-radius: 99px; background: #e05667; color: white; font-size: .55rem; font-weight: 750; }
+.notificationPanel { width: 340px; }
+.notificationHeading { display: flex; align-items: center; justify-content: space-between; padding: 14px 15px; border-bottom: 1px solid var(--border-subtle); color: var(--accent-primary); }
+.notificationHeading > div { display: flex; flex-direction: column; gap: 3px; }
+.notificationHeading strong { color: var(--text-main); font-size: .78rem; }
+.notificationHeading small { color: var(--text-dim); font-size: .62rem; }
+.notificationItem { position: relative; display: flex; width: 100%; align-items: center; gap: 10px; padding: 12px 14px; border: 0; border-bottom: 1px solid var(--border-subtle); background: transparent; text-align: left; cursor: pointer; }
+.notificationItem:hover { background: var(--bg-surface); }
+.notificationIcon { display: grid; width: 31px; height: 31px; flex: 0 0 auto; place-items: center; border-radius: 9px; background: #f0f3f8; color: #6f8099; }
+.notificationBlue { background: #edf4ff; color: var(--accent-primary); }
+.notificationItem > span:nth-child(2) { display: flex; min-width: 0; flex: 1; flex-direction: column; gap: 4px; }
+.notificationItem strong { overflow: hidden; color: var(--text-main); font-size: .67rem; font-weight: 650; text-overflow: ellipsis; white-space: nowrap; }
+.notificationItem small { color: var(--text-dim); font-size: .59rem; }
+.notificationItem > i { width: 6px; height: 6px; border-radius: 50%; background: var(--accent-primary); }
+.waiverIcon { color: #b77911; font-size: .8rem; font-weight: 700; }
+.viewNotifications { width: 100%; padding: 11px; border: 0; background: transparent; color: var(--accent-primary); font: inherit; font-size: .67rem; font-weight: 650; cursor: pointer; }
+.popoverDismiss { position: fixed; inset: 72px 0 0; z-index: 20; border: 0; background: rgba(15, 23, 42, .05); }
+
+@media (max-width: 768px) {
+  .searchInput { position: fixed; top: 72px; left: 12px; right: 12px; z-index: 44; width: calc(100vw - 24px); margin: 0; }
+  .searchShell:has(.searchInput) > .iconButton { margin-left: 0; }
+  .searchResults { position: fixed; top: 119px; left: 12px; right: 12px; width: auto; }
+  .notificationPanel { position: fixed; top: 72px; left: 12px; right: 12px; width: auto; }
+  .popoverDismiss { top: 64px; }
+}
+
+/* Header controls stay legible and comfortably tappable on narrow screens. */
+.iconButton { min-width: 40px; height: 40px; border-radius: 11px; }
+.instituteIcon { width: 38px; height: 38px; }
+.profile { padding-left: 14px; }
+.toast { border-radius: 12px; }
+@media (max-width: 768px) {
+  .iconButton { min-width: 38px; height: 38px; }
+}

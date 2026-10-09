@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Send, Bell, Sparkles } from 'lucide-react';
+import { Send, Bell } from 'lucide-react';
 
 interface NoticesBroadcastTabProps {
   onBroadcast: (title: string, audience: 'all' | 'teachers' | 'guardians', content: string) => void;

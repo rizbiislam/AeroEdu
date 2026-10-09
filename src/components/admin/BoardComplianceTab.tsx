@@ -1,6 +1,6 @@
 import React from 'react';
 import type { BoardComplianceRecord } from '../../types';
-import { ShieldCheck, AlertTriangle, Download } from 'lucide-react';
+import { Download } from 'lucide-react';
 
 interface BoardComplianceTabProps {
   complianceRecords: BoardComplianceRecord[];
@@ -54,36 +54,36 @@ export const BoardComplianceTab: React.FC<BoardComplianceTabProps> = ({
           <tbody>
             {complianceRecords.map(rec => {
               const isEligible = rec.is_eligible_for_board;
-              const hasAttendanceIssue = rec.attendance_percentage < 75;
+              const hasAttendanceIssue = rec.attendance_rate < 75;
 
               return (
                 <tr key={rec.student_id}>
                   <td style={{ fontFamily: 'monospace', fontWeight: 700 }}>#{rec.roll_number}</td>
                   <td>
                     <div style={{ fontWeight: 700, color: 'var(--text-main)' }}>{rec.student_name}</div>
-                    <div style={{ fontSize: '0.72rem', color: 'var(--text-dim)' }}>Reg: {rec.registration_number || '2025-001402'} • {rec.class_name}</div>
+                    <div style={{ fontSize: '0.72rem', color: 'var(--text-dim)' }}>Reg: {rec.reg_number} • {rec.class_name}</div>
                   </td>
                   <td>
                     <div style={{ fontWeight: 700, color: hasAttendanceIssue ? '#ef4444' : '#10b981' }}>
-                      {rec.attendance_percentage}%
+                      {rec.attendance_rate}%
                     </div>
                     <div className="compliance-meter-track">
                       <div
                         className="compliance-meter-fill"
                         style={{
-                          width: `${rec.attendance_percentage}%`,
+                          width: `${rec.attendance_rate}%`,
                           backgroundColor: hasAttendanceIssue ? '#ef4444' : '#10b981'
                         }}
                       />
                     </div>
                   </td>
                   <td style={{ textAlign: 'center' }}>
-                    <span className={`badge ${rec.pre_test_passed ? 'badge-green' : 'badge-red'}`}>
-                      {rec.pre_test_passed ? 'Passed All' : 'Failed'}
+                    <span className={`badge ${rec.pretest_gpa > 0 ? 'badge-green' : 'badge-red'}`}>
+                      {rec.pretest_gpa > 0 ? `Passed · GPA ${rec.pretest_gpa.toFixed(2)}` : 'Review required'}
                     </span>
                   </td>
-                  <td style={{ textAlign: 'center', fontWeight: 700, color: rec.failed_subjects.length > 0 ? '#ef4444' : 'var(--text-dim)' }}>
-                    {rec.failed_subjects.length > 0 ? rec.failed_subjects.join(', ') : 'None'}
+                  <td style={{ textAlign: 'center', fontWeight: 700, color: rec.pretest_gpa === 0 ? '#ef4444' : 'var(--text-dim)' }}>
+                    {rec.pretest_gpa === 0 ? 'Check pre-test' : 'None'}
                   </td>
                   <td style={{ textAlign: 'center' }}>
                     <span className={`badge ${isEligible ? 'badge-green' : 'badge-red'}`} style={{ fontWeight: 800 }}>
@@ -92,7 +92,7 @@ export const BoardComplianceTab: React.FC<BoardComplianceTabProps> = ({
                   </td>
                   <td>
                     <span style={{ fontSize: '0.75rem', color: isEligible ? '#10b981' : '#f87171' }}>
-                      {rec.recommended_action}
+                      {rec.is_eligible_for_board ? 'Ready for form fill-up' : rec.ineligibility_reason || 'Resolve eligibility checks'}
                     </span>
                   </td>
                 </tr>

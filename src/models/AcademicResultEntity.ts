@@ -4,9 +4,13 @@ import { GradeCalculatorService } from '../services/GradeCalculatorService';
 export class AcademicResultEntity {
   public readonly studentId: string;
   public readonly studentName: string;
+  public readonly studentNameBn: string;
+  public readonly registrationNumber: string;
   public readonly rollNumber: number;
   public readonly className: string;
   public readonly sectionName: string;
+  public readonly examId: string;
+  public readonly examName: string;
   public scores: SubjectScore[];
   public totalMarksObtained: number;
   public readonly totalMaxMarks: number;
@@ -16,15 +20,19 @@ export class AcademicResultEntity {
   public isPassed: boolean;
   public meritPosition: number;
   public attendancePercentage: number;
-  public conductRating: string;
+  public conductRating: StudentAcademicResult['conduct_rating'];
   public teacherRemarks: string;
 
   constructor(data: StudentAcademicResult) {
     this.studentId = data.student_id;
     this.studentName = data.student_name;
+    this.studentNameBn = data.student_name_bn;
+    this.registrationNumber = data.registration_number;
     this.rollNumber = data.roll_number;
     this.className = data.class_name;
     this.sectionName = data.section_name;
+    this.examId = data.exam_id;
+    this.examName = data.exam_name;
     this.scores = [...data.scores];
     this.totalMarksObtained = data.total_marks_obtained;
     this.totalMaxMarks = data.total_max_marks;
@@ -103,9 +111,13 @@ export class AcademicResultEntity {
     return {
       student_id: this.studentId,
       student_name: this.studentName,
+      student_name_bn: this.studentNameBn,
       roll_number: this.rollNumber,
+      registration_number: this.registrationNumber,
       class_name: this.className,
       section_name: this.sectionName,
+      exam_id: this.examId,
+      exam_name: this.examName,
       scores: this.scores,
       total_marks_obtained: this.totalMarksObtained,
       total_max_marks: this.totalMaxMarks,

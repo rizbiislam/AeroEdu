@@ -1,7 +1,7 @@
 import React from 'react';
 import type { AdmissionApplication } from '../../types';
 import { AdmissionApplicationEntity } from '../../models/AdmissionApplicationEntity';
-import { CheckCircle2, XCircle, FileText, Award } from 'lucide-react';
+import { CheckCircle2, XCircle, Award } from 'lucide-react';
 
 interface AdmissionsManagementTabProps {
   admissions: AdmissionApplication[];

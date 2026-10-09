@@ -15,6 +15,7 @@ export class StudentEntity {
   public readonly guardianName: string;
   public readonly guardianPhone: string;
   public readonly guardianRelation: string;
+  public readonly address: string;
   public attendancePercentage: number;
   public status: 'active' | 'transferred' | 'graduated' | 'suspended';
   public bloodGroup?: string;
@@ -34,6 +35,7 @@ export class StudentEntity {
     this.guardianName = data.guardian_name;
     this.guardianPhone = data.guardian_phone;
     this.guardianRelation = data.guardian_relation;
+    this.address = data.address;
     this.attendancePercentage = data.attendance_percentage;
     this.status = data.status;
     this.bloodGroup = data.blood_group;
@@ -86,6 +88,7 @@ export class StudentEntity {
       guardian_relation: this.guardianRelation,
       attendance_percentage: this.attendancePercentage,
       status: this.status,
+      address: this.address,
       blood_group: this.bloodGroup
     };
   }

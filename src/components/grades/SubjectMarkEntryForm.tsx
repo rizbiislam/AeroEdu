@@ -1,6 +1,5 @@
 import React from 'react';
 import type { StudentAcademicResult, SubjectScore } from '../../types';
-import { GradeCalculatorService } from '../../services/GradeCalculatorService';
 import { Save } from 'lucide-react';
 
 interface SubjectMarkEntryFormProps {
@@ -95,7 +94,9 @@ export const SubjectMarkEntryForm: React.FC<SubjectMarkEntryFormProps> = ({
               const score: SubjectScore = res.scores.find(s => s.subject_code === selectedSubjectCode) || {
                 subject_code: selectedSubjectCode,
                 subject_name: currentSubject.name,
+                subject_name_bn: currentSubject.name,
                 is_optional: selectedSubjectCode === '126',
+                full_marks: currentSubject.cqMax + currentSubject.mcqMax + (currentSubject.hasPr ? currentSubject.prMax : 0),
                 cq_marks: 0,
                 cq_pass: Math.ceil(currentSubject.cqMax * 0.33),
                 mcq_marks: 0,
@@ -103,6 +104,7 @@ export const SubjectMarkEntryForm: React.FC<SubjectMarkEntryFormProps> = ({
                 pr_marks: 0,
                 pr_pass: currentSubject.hasPr ? Math.ceil(currentSubject.prMax * 0.33) : undefined,
                 total_marks: 0,
+                highest_marks: 0,
                 letter_grade: 'F',
                 grade_point: 0,
                 is_passed: false

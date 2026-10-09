@@ -1,7 +1,7 @@
 import React from 'react';
 import type { TeacherLeaveRequest, StaffMember } from '../../types';
 import { TeacherLeaveEntity } from '../../models/TeacherLeaveEntity';
-import { CheckCircle2, XCircle, Clock, Briefcase } from 'lucide-react';
+import { CheckCircle2, XCircle } from 'lucide-react';
 
 interface FacultyLeavesTabProps {
   leaves: TeacherLeaveRequest[];
@@ -12,7 +12,6 @@ interface FacultyLeavesTabProps {
 
 export const FacultyLeavesTab: React.FC<FacultyLeavesTabProps> = ({
   leaves,
-  staff,
   onApprove,
   onReject
 }) => {

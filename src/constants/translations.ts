@@ -36,6 +36,11 @@ export const translations = {
     nav_super_support: "Support Queue & SLA",
 
     nav_institute_setup: "Branding & EIIN Setup",
+    nav_admissions: "Admissions Queue",
+    nav_api_access: "API Keys & Webhooks",
+    nav_library: "Library",
+    nav_transport: "Transport",
+    nav_hostel: "Hostel",
     nav_staff: "Staff Directory & Roles",
     nav_classes: "Classes & Sections",
     nav_waiver_queue: "Fee Waiver Approvals",
@@ -249,6 +254,11 @@ export const translations = {
     nav_super_support: "সাপোর্ট কিউ ও এসএলএ",
 
     nav_institute_setup: "লোগো ও ইআইআইএন সেটআপ",
+    nav_admissions: "ভর্তি আবেদন",
+    nav_api_access: "এপিআই কী ও ওয়েবহুক",
+    nav_library: "গ্রন্থাগার",
+    nav_transport: "যাতায়াত",
+    nav_hostel: "আবাসিক হল",
     nav_staff: "শিক্ষক ও কর্মকর্তা তালিকা",
     nav_classes: "শ্রেণি ও শাখা ব্যবস্থাপনা",
     nav_waiver_queue: "ফি মওকুফ অনুমোদন তালিকা",

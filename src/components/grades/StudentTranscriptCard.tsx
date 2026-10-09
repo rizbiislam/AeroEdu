@@ -1,7 +1,6 @@
 import React from 'react';
 import type { StudentAcademicResult, Institute } from '../../types';
 import { SecurityQRCode } from '../common/SecurityQRCode';
-import { Award } from 'lucide-react';
 
 interface StudentTranscriptCardProps {
   result: StudentAcademicResult;

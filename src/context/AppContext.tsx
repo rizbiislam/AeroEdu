@@ -1,13 +1,14 @@
 // AeroEdu App State & Reactive Store
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { CircleHelp } from 'lucide-react';
 import type { 
-  RoleType, Language, Institute, User, Student, StaffMember, Exam, 
+  RoleType, Language, Institute, User, Student, StaffMember, AcademicClass, Exam,
   ExamScheduleItem, AdmitCard, MarkEntry, Invoice, FeeWaiverRequest, 
   PaymentTransaction, AuditLog, SupportTicket, RoutineItem, Announcement,
   StudentAcademicResult, AdmissionApplication, TeacherLeaveRequest, BoardComplianceRecord
 } from '../types';
 import { 
-  mockInstitutes, mockUsers, mockStudents, mockStaff, mockExams, mockExamSchedules, 
+  mockInstitutes, mockUsers, mockStudents, mockStaff, mockClasses, mockExams, mockExamSchedules,
   mockAdmitCards, mockMarks, mockInvoices, mockFeeWaivers, mockPayments, 
   mockAuditLogs, mockSupportTickets, mockRoutine, mockAnnouncements,
   mockAcademicResults, mockAdmissions, mockTeacherLeaves, mockBoardCompliance
@@ -15,6 +16,7 @@ import {
 import { translations } from '../constants/translations';
 import { getNavItemsForRole, type NavItem } from '../config/roleNavigation';
 import { WorkspaceAccessService } from '../services/WorkspaceAccessService';
+import { PlanEntitlementService } from '../services/PlanEntitlementService';
 import { DemoAuthenticationService } from '../services/DemoAuthenticationService';
 import confetti from 'canvas-confetti';
 import { AcademicResultEntity } from '../models/AcademicResultEntity';
@@ -45,6 +47,7 @@ interface AppContextType {
   // Data states
   students: Student[];
   staff: StaffMember[];
+  academicClasses: AcademicClass[];
   exams: Exam[];
   examSchedules: ExamScheduleItem[];
   admitCards: AdmitCard[];
@@ -81,6 +84,9 @@ interface AppContextType {
   reconcilePayment: (paymentId: string) => void;
   publishExamResults: (examId: string) => void;
   createSupportTicket: (ticket: Partial<SupportTicket>) => void;
+  createStaffMember: (staff: Pick<StaffMember, 'full_name' | 'email' | 'designation' | 'department' | 'role'>) => void;
+  createAcademicClass: (academicClass: Pick<AcademicClass, 'name' | 'code'>) => void;
+  publishAnnouncement: (announcement: Pick<Announcement, 'title' | 'content' | 'target_audience'>) => void;
   submitCSAT: (ticketId: string, rating: number) => void;
   selectedAdmitCard: AdmitCard | null;
   setSelectedAdmitCard: (card: AdmitCard | null) => void;
@@ -96,15 +102,16 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [role, setRoleState] = useState<RoleType>('institute_admin');
   const [authenticatedUser, setAuthenticatedUser] = useState<User | null>(null);
   const [language, setLanguage] = useState<Language>('en');
-  const [theme, setTheme] = useState<'dark' | 'light'>('light');
-  const [activeTab, setActiveTab] = useState<string>('overview');
+  const [theme, setTheme] = useState<'dark' | 'light'>('dark');
+  const [activeTab, setActiveTabState] = useState<string>('overview');
 
   // Core Data Collections
   const [currentInstitute, setCurrentInstitute] = useState<Institute>(mockInstitutes[0]);
   const [availableInstitutes, setAvailableInstitutes] = useState<Institute[]>([]);
   const [hasSelectedInstitute, setHasSelectedInstitute] = useState(false);
   const [students] = useState<Student[]>(mockStudents);
-  const [staff] = useState<StaffMember[]>(mockStaff);
+  const [staff, setStaff] = useState<StaffMember[]>(mockStaff);
+  const [academicClasses, setAcademicClasses] = useState<AcademicClass[]>(mockClasses);
   const [exams, setExams] = useState<Exam[]>(mockExams);
   const [examSchedules] = useState<ExamScheduleItem[]>(mockExamSchedules);
   const [admitCards] = useState<AdmitCard[]>(mockAdmitCards);
@@ -115,7 +122,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [auditLogs, setAuditLogs] = useState<AuditLog[]>(mockAuditLogs);
   const [supportTickets, setSupportTickets] = useState<SupportTicket[]>(mockSupportTickets);
   const [routine] = useState<RoutineItem[]>(mockRoutine);
-  const [announcements] = useState<Announcement[]>(mockAnnouncements);
+  const [announcements, setAnnouncements] = useState<Announcement[]>(mockAnnouncements);
   const [selectedAdmitCard, setSelectedAdmitCard] = useState<AdmitCard | null>(mockAdmitCards[0]);
 
   // Auth state
@@ -169,8 +176,21 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       admissions.filter(application => application.status === 'pending' || application.status === 'interview_scheduled').length +
       teacherLeaves.filter(leave => leave.status === 'pending').length
   });
-  const workspaceAccess = new WorkspaceAccessService(roleNavigation.map(item => item.id));
-  const availableWorkspaces = workspaceAccess.getAvailableWorkspaces(roleNavigation);
+  const commonNavigation = [...roleNavigation, { id: 'knowledge_base', label: t.nav_kb, icon: CircleHelp }];
+  const entitlementService = new PlanEntitlementService();
+  const planNavigation = role === 'super_admin'
+    ? commonNavigation
+    : commonNavigation.filter(item => entitlementService.hasPageEntitlement(currentInstitute.current_plan, item.id));
+  const workspaceAccess = new WorkspaceAccessService(planNavigation.map(item => item.id));
+  const availableWorkspaces = workspaceAccess.getAvailableWorkspaces(planNavigation);
+
+  const setActiveTab = (pageId: string) => {
+    if (!workspaceAccess.canAccess(pageId)) {
+      showToast(t.portal_access_denied, 'error');
+      return;
+    }
+    setActiveTabState(pageId);
+  };
 
   const openWorkspace = (pageId: string) => {
     if (!workspaceAccess.canAccess(pageId)) {
@@ -178,7 +198,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       return;
     }
 
-    setActiveTab(pageId);
+    setActiveTabState(pageId);
     setIsAuthenticated(true);
   };
 
@@ -365,6 +385,51 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     showToast(`Support Ticket #${newTicket.ticket_number} created! Assigned to tier-1 queue.`, 'success');
   };
 
+  const createStaffMember = (input: Pick<StaffMember, 'full_name' | 'email' | 'designation' | 'department' | 'role'>) => {
+    const nextStaff: StaffMember = {
+      id: `staff-${Date.now()}`,
+      employee_id: `AE-${Date.now().toString().slice(-5)}`,
+      full_name: input.full_name,
+      full_name_bn: input.full_name,
+      designation: input.designation,
+      department: input.department,
+      role: input.role,
+      phone: '',
+      email: input.email,
+      blood_group: '',
+      joining_date: new Date().toISOString().slice(0, 10),
+      emergency_contact: ''
+    };
+    setStaff((previous) => [nextStaff, ...previous]);
+    showToast(`${input.full_name} added to the staff directory.`, 'success');
+  };
+
+  const createAcademicClass = (input: Pick<AcademicClass, 'name' | 'code'>) => {
+    setAcademicClasses((previous) => [{
+      id: `class-${Date.now()}`,
+      name: input.name,
+      name_bn: input.name,
+      code: input.code,
+      sections_count: 0,
+      students_count: 0
+    }, ...previous]);
+    showToast(`${input.name} added to the academic structure.`, 'success');
+  };
+
+  const publishAnnouncement = (input: Pick<Announcement, 'title' | 'content' | 'target_audience'>) => {
+    const announcement: Announcement = {
+      id: `notice-${Date.now()}`,
+      title: input.title,
+      content: input.content,
+      target_audience: input.target_audience,
+      author_name: currentUser.full_name,
+      author_role: currentUser.role,
+      created_at: new Date().toLocaleString()
+    };
+    setAnnouncements((previous) => [announcement, ...previous]);
+    showToast('Campus update published.', 'success');
+  };
+
   const submitCSAT = (ticketId: string, rating: number) => {
     setSupportTickets(prev => prev.map(t => t.id === ticketId ? { ...t, csat_rating: rating, status: 'resolved' } : t));
     confetti({ particleCount: 50, spread: 50 });
@@ -392,15 +457,15 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   };
 
   const setLandingTab = (targetRole: RoleType) => {
-    if (targetRole === 'super_admin') setActiveTab('overview');
-    else if (targetRole === 'institute_admin') setActiveTab('overview');
-    else if (targetRole === 'class_teacher') setActiveTab('attendance_entry');
-    else if (targetRole === 'teacher') setActiveTab('grades');
-    else if (targetRole === 'exam_controller') setActiveTab('grades');
-    else if (targetRole === 'accountant') setActiveTab('billing');
-    else if (targetRole === 'student') setActiveTab('student_home');
-    else if (targetRole === 'guardian') setActiveTab('guardian_home');
-    else setActiveTab('overview');
+    if (targetRole === 'super_admin') setActiveTabState('overview');
+    else if (targetRole === 'institute_admin') setActiveTabState('overview');
+    else if (targetRole === 'class_teacher') setActiveTabState('attendance_entry');
+    else if (targetRole === 'teacher') setActiveTabState('grades');
+    else if (targetRole === 'exam_controller') setActiveTabState('grades');
+    else if (targetRole === 'accountant') setActiveTabState('billing');
+    else if (targetRole === 'student') setActiveTabState('student_home');
+    else if (targetRole === 'guardian') setActiveTabState('guardian_home');
+    else setActiveTabState('overview');
   };
 
   const selectInstitute = (instituteId: string) => {
@@ -468,6 +533,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       t,
       students,
       staff,
+      academicClasses,
       exams,
       examSchedules,
       admitCards,
@@ -500,6 +566,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       reconcilePayment,
       publishExamResults,
       createSupportTicket,
+      createStaffMember,
+      createAcademicClass,
+      publishAnnouncement,
       submitCSAT,
       selectedAdmitCard,
       setSelectedAdmitCard,

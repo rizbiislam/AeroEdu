@@ -15,9 +15,11 @@ import { InstituteAdminHub } from './components/admin/InstituteAdminHub';
 import { InstituteDirectoryView } from './components/admin/InstituteDirectoryView';
 import { LoginPortal } from './components/auth/LoginPortal';
 import { ResultVerificationView } from './components/examination/ResultVerificationView';
+import { WorkspaceView } from './components/operations/WorkspaceView';
+import { PlatformSupportView } from './components/support/PlatformSupportView';
 
 const MainAppContent: React.FC = () => {
-  const { activeTab, t } = useApp();
+  const { activeTab, role, t } = useApp();
   const [navigationOpen, setNavigationOpen] = useState(false);
 
   const renderActiveView = () => {
@@ -61,7 +63,7 @@ const MainAppContent: React.FC = () => {
         return <AcademicGradesView />;
 
       case 'support':
-        return <SupportTicketsView />;
+        return role === 'super_admin' ? <PlatformSupportView /> : <SupportTicketsView />;
 
       case 'audit_logs':
         return <AuditLogView />;
@@ -73,6 +75,26 @@ const MainAppContent: React.FC = () => {
       case 'routine':
       case 'student_routine':
         return <ClassRoutineView />;
+
+      case 'staff':
+      case 'classes':
+      case 'my_classes':
+      case 'institute_setup':
+      case 'communications':
+      case 'settings':
+      case 'subscription':
+      case 'plans':
+      case 'onboarding':
+      case 'api_access':
+      case 'library':
+      case 'transport':
+      case 'hostel':
+      case 'admissions':
+      case 'reports':
+      case 'knowledge_base':
+      case 'fee_structures':
+      case 'dues_report':
+        return <WorkspaceView />;
 
       default:
         return <OverviewDashboard />;

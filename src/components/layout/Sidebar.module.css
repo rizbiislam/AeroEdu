@@ -175,3 +175,16 @@
     transition: none;
   }
 }
+
+/* Refined navigation rhythm */
+.brand { min-height: 80px; padding-inline: 20px; }
+.brandMark { box-shadow: 0 4px 10px rgba(39, 102, 213, .15); }
+.navigation { gap: 5px; padding: 24px 12px; }
+.navigationLabel { padding-bottom: 12px; }
+.navigationItem { min-height: 44px; border-radius: 10px; font-size: .82rem; }
+.navigationItem.active { box-shadow: inset 3px 0 0 var(--accent-primary); }
+.badge { background: var(--bg-surface); }
+
+@media (max-width: 768px) {
+  .sidebar { width: min(286px, calc(100vw - 54px)); min-width: min(286px, calc(100vw - 54px)); }
+}

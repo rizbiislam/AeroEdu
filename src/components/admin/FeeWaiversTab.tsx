@@ -1,6 +1,6 @@
 import React from 'react';
 import type { FeeWaiverRequest } from '../../types';
-import { Award, CheckCircle2, XCircle } from 'lucide-react';
+import { CheckCircle2, XCircle } from 'lucide-react';
 
 interface FeeWaiversTabProps {
   waivers: FeeWaiverRequest[];
@@ -35,8 +35,8 @@ export const FeeWaiversTab: React.FC<FeeWaiversTabProps> = ({
             <div className="applicant-header-row">
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                 <span className="applicant-name">{w.student_name}</span>
-                <span className="badge badge-blue">Roll #{w.roll_number} • {w.class_name}</span>
-                <span className="badge badge-purple">{w.discount_percentage}% Concession ({w.waiver_type})</span>
+                <span className="badge badge-blue">{w.class_name}</span>
+                <span className="badge badge-purple">{w.percentage ?? 0}% Concession ({w.waiver_type})</span>
               </div>
               <span className={`badge ${w.status === 'approved' ? 'badge-green' : w.status === 'rejected' ? 'badge-red' : 'badge-amber'}`}>
                 {w.status.toUpperCase()}
@@ -44,11 +44,11 @@ export const FeeWaiversTab: React.FC<FeeWaiversTabProps> = ({
             </div>
 
             <div className="applicant-meta-grid">
-              <div>Fee Head: <strong>{w.fee_head}</strong></div>
-              <div>Discounted Amount: <strong style={{ color: '#10b981' }}>৳{w.discount_amount.toLocaleString()}</strong></div>
-              <div>Basis of Claim: <strong>{w.basis_description}</strong></div>
-              <div>Requested By: <strong>{w.requested_by_name}</strong></div>
-              <div>Application Date: <strong>{w.created_at}</strong></div>
+              <div>Fee Head: <strong>{w.waiver_basis.replaceAll('_', ' ')}</strong></div>
+              <div>Discounted Amount: <strong style={{ color: '#10b981' }}>৳{((w.original_amount * (w.percentage ?? 0)) / 100).toLocaleString()}</strong></div>
+              <div>Basis of Claim: <strong>{w.reason}</strong></div>
+              <div>Requested By: <strong>{w.requested_by}</strong></div>
+              <div>Application Date: <strong>{w.requested_at}</strong></div>
             </div>
 
             {w.status === 'pending' && (
