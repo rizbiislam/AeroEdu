@@ -2,7 +2,7 @@ name: Deploy frontend demo to GitHub Pages
 
 on:
   push:
-    branches: [frontend-demo]
+    branches: [frontend]
   workflow_dispatch:
 
 permissions:

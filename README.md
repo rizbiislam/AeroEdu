@@ -23,13 +23,13 @@ The login asks for the institute slug, email, and password. Vite forwards `/api/
 
 Set `VITE_AUTH_MODE=demo` to use the sample accounts and in-memory sample data. Demo mode is for UI preview only; it does not represent stored school records or server-enforced permissions. Sample credentials are listed in the sign-in panel.
 
-The `frontend-demo` branch is configured to deploy this frontend to GitHub Pages:
+The `frontend` branch is configured to deploy this frontend to GitHub Pages:
 
 ```text
 https://rizbiislam.github.io/AeroEdu/
 ```
 
-Each push to `frontend-demo` builds and deploys the demo automatically.
+Each push to `frontend` builds and deploys the demo automatically.
 
 ## Build
 
